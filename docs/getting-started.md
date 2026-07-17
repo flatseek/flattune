@@ -30,7 +30,29 @@ pip install -e ".[unsloth]"
 
 ## Two Ways to Use Flattune
 
-### 1. Teach Framework (No Flatseek Required)
+### 1. HuggingFace Datasets (Easiest)
+
+Use public datasets directly from HuggingFace:
+
+```bash
+# Build from HuggingFace .fsk (Olympic athletes example)
+flattune build configs/athletes-qa.yml --yes
+
+# Train
+flattune train configs/athletes-qa.yml
+
+# Merge + Export
+flattune merge configs/athletes-qa.yml
+flattune export configs/athletes-qa.yml
+
+# Full pipeline
+flattune run configs/athletes-qa.yml
+```
+
+Available datasets:
+- `flatseek/public-dataset/271k-athletes.fsk` - 271K Olympic athletes (1800-2000)
+
+### 2. Teach Framework (No Flatseek Required)
 
 Start from raw files — markdown, OpenAPI specs, SQL schemas, FAQs:
 

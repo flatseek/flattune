@@ -234,3 +234,47 @@ benchmark:
   backend: lmstudio
   num_runs: 10
 ```
+
+## HuggingFace .fsk Example
+
+Use public datasets from HuggingFace directly:
+
+```yaml
+# configs/athletes-qa.yml
+name: athletes-qa
+
+flatseek:
+  # HuggingFace .fsk URL - 271K Olympic athletes (1800-2000)
+  path: https://huggingface.co/datasets/flatseek/public-dataset/resolve/main/271k-athletes.fsk
+  query: "*"
+
+dataset:
+  type: qa
+  # Query for Asian athletes only
+  query: "country:(China OR Japan OR Korea OR India OR Indonesia)"
+  max_samples: 500
+  generators: [qa, facts]
+
+model:
+  source: huggingface
+  repo: Qwen/Qwen2.5-0.5B-Instruct
+
+train:
+  backend: transformers
+  epochs: 1
+  lora_rank: 8
+  batch_size: 1
+
+benchmark:
+  backend: lmstudio
+  prompt_file: configs/athletes-prompts.json
+  num_runs: 3
+```
+
+### Available Public Datasets
+
+| Dataset | URL | Description |
+|---------|-----|-------------|
+| `271k-athletes.fsk` | `flatseek/public-dataset/resolve/main/271k-athletes.fsk` | 271K Olympic athletes (1800-2000) |
+
+See [HuggingFace dataset page](https://huggingface.co/datasets/flatseek/public-dataset) for more datasets.

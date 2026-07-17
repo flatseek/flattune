@@ -333,32 +333,69 @@ No GPU? Transformers backend runs on CPU and Apple MPS.
 
 ## Quick start
 
+### Option 1: Use HuggingFace datasets (recommended)
+
+Flattune can directly use public datasets from HuggingFace as `.fsk` files:
+
+```bash
+# Build dataset from HuggingFace .fsk (Olympic athletes example)
+flattune build configs/athletes-qa.yml --yes
+
+# Train the model
+flattune train configs/athletes-qa.yml
+
+# Merge LoRA with base model
+flattune merge configs/athletes-qa.yml
+
+# Export to GGUF
+flattune export configs/athletes-qa.yml
+
+# Run full pipeline
+flattune run configs/athletes-qa.yml
+```
+
+### Option 2: Teach from local documents
+
 ```bash
 flattune teach knowledge ./docs/*.md --distill -o dataset.jsonl
 ```
 
+### Example config: HuggingFace .fsk dataset
+
 ```yaml
-# configs/my_project.yml
-name: my_project
+# configs/athletes-qa.yml
+name: athletes-qa
 
 flatseek:
-  path: ./data.fsk
+  path: https://huggingface.co/datasets/flatseek/public-dataset/resolve/main/271k-athletes.fsk
+  query: "*"
 
 dataset:
-  generators: [qa, summary]
+  type: qa
+  query: "country:(China OR Japan OR Korea OR India)"
+  max_samples: 500
+  generators: [qa, facts]
+
+model:
+  source: huggingface
+  repo: Qwen/Qwen2.5-0.5B-Instruct
 
 train:
-  backend: unsloth
-  epochs: 3
-  lora_rank: 16
+  backend: transformers
+  epochs: 1
+  lora_rank: 8
 
-export:
-  format: gguf
+benchmark:
+  backend: lmstudio
+  prompt_file: configs/athletes-prompts.json
 ```
 
-```bash
-flattune run configs/my_project.yml
-```
+### Available public datasets on HuggingFace
+
+- `flatseek/public-dataset/271k-athletes.fsk` - 271K Olympic athletes (1800-2000)
+- More datasets coming soon
+
+See [Configuration Reference](docs/configuration.md) for all options.
 
 ---
 
