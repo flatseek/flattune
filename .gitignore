@@ -3,6 +3,9 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+# macOS
+.DS_Store
+
 # C extensions
 *.so
 
@@ -24,6 +27,10 @@ share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
+.claude
+build.md
+CLAUDE.md
+CLAUDE*
 MANIFEST
 
 # PyInstaller

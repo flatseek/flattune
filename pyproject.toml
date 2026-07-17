@@ -1,0 +1,77 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "flattune"
+version = "0.1.0"
+description = "Fine-tuning orchestrator for Flatseek knowledge bases"
+readme = "README.md"
+requires-python = ">=3.10"
+
+license = {text = "Apache-2.0"}
+authors = [
+  { name = "Judotens Budiarto", email = "judotens@flatseek.io" }
+]
+
+keywords = ["fine-tuning", "llm", "flatseek", "unsloth", "lora", "gguf"]
+
+dependencies = [
+    "flatseek>=0.1.10",
+    "transformers>=4.40.0",
+    "peft>=0.10.0",
+    "trl>=0.8.0",
+    "click>=8.1.0",
+    "pyyaml>=6.0",
+    "pydantic>=2.0.0",
+    "rich>=13.0.0",
+    "matplotlib>=3.7.0",
+]
+
+[project.optional-dependencies]
+unsloth = [
+    "unsloth>=2024.4.0",
+    "unsloth_zoo>=2024.4.0",
+]
+gguf = [
+    "llama-cpp-python>=0.2.0",
+]
+mlx = [
+    "mlx>=0.1.0",
+]
+dev = [
+    "pytest>=8.0.0",
+    "pytest-asyncio>=0.23.0",
+    "black>=24.0.0",
+    "ruff>=0.3.0",
+    "mypy>=1.9.0",
+]
+
+[project.scripts]
+flattune = "flattune.__main__:main"
+
+[project.urls]
+Homepage = "https://flattune.flatseek.io"
+Documentation = "https://flatseek.github.io/flattune"
+Repository = "https://github.com/flatseek/flattune"
+Issues = "https://github.com/flatseek/flattune/issues"
+
+
+[tool.setuptools.packages.find]
+where = ["src"]
+include = ["flattune*"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312"]
+
+[tool.ruff]
+line-length = 100
+select = ["E", "F", "W", "I", "N", "UP", "B", "C4"]
+ignore = ["E501"]
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_ignores = true
+disallow_untyped_defs = false
