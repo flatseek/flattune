@@ -257,7 +257,7 @@ dataset:
 
 model:
   source: huggingface
-  repo: Qwen/Qwen2.5-0.5B-Instruct
+  repo: HuggingFaceTB/SmolLM2-135M
 
 train:
   backend: transformers
