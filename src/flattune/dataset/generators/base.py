@@ -110,9 +110,9 @@ class BaseGenerator(ABC):
         Returns:
             First non-empty field value or empty string.
         """
-        for field in fields:
-            if field in document and document[field]:
-                value = document[field]
+        for fld in fields:
+            if fld in document and document[fld]:
+                value = document[fld]
                 if isinstance(value, str):
                     return value
                 elif isinstance(value, (list, dict)):
