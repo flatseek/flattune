@@ -1,8 +1,9 @@
 """FlatSeek index parser."""
 
 import json
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
 
 from flattune.teach.parsers.base import BaseParser, ParseResult
 from flattune.teach.registry import SourceType, register_parser
@@ -29,7 +30,7 @@ class FlatseekParser(BaseParser):
 
         try:
             # FlatSeek .fsk is typically a JSON array or NDJSON
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 content = f.read().strip()
 
             # Try parsing as JSON array first

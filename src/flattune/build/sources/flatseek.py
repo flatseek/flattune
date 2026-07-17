@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Any
 
 from flattune.build.registry import (
-    SourceRegistry,
     BaseSourceDetector,
     SourceDetectionResult,
     register_source,

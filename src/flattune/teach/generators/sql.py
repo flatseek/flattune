@@ -2,7 +2,7 @@
 
 import logging
 import re
-from typing import Any, Iterator
+from collections.abc import Iterator
 
 from flattune.teach.generators.base import BaseGenerator, GeneratedSample
 from flattune.teach.knowledge_graph import KnowledgeNode
@@ -52,7 +52,7 @@ class SQLGenerator(BaseGenerator):
 
         # Extract schema information
         tables = metadata.get("tables", [])
-        relationships = metadata.get("relationships", [])
+        metadata.get("relationships", [])
 
         if not tables:
             # Try to parse from content
@@ -138,7 +138,7 @@ class SQLGenerator(BaseGenerator):
                 # Use actual column names
                 for col in columns[:2]:
                     col_name = col.get("name", "id")
-                    col_type = col.get("type", "integer")
+                    col.get("type", "integer")
 
                     yield GeneratedSample(
                         conversation=[

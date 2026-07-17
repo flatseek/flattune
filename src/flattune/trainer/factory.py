@@ -2,12 +2,12 @@
 
 import logging
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from flattune.config import TrainBackend
 from flattune.trainer.base import TrainerBase
-from flattune.trainer.unsloth_trainer import UnslothTrainer
 from flattune.trainer.transformers_trainer import TransformersTrainer
+from flattune.trainer.unsloth_trainer import UnslothTrainer
 
 logger = logging.getLogger(__name__)
 
@@ -32,11 +32,11 @@ class TrainerFactory:
         cls,
         backend: TrainBackend,
         model_path: str,
-        dataset_path: Optional[str] = None,
-        output_dir: Optional[Path] = None,
-        config: Optional[Any] = None,
-        flatseek_provider: Optional[Any] = None,
-        flatseek_query: Optional[str] = None,
+        dataset_path: str | None = None,
+        output_dir: Path | None = None,
+        config: Any | None = None,
+        flatseek_provider: Any | None = None,
+        flatseek_query: str | None = None,
     ) -> TrainerBase:
         """Create a trainer instance for the specified backend.
 

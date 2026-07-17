@@ -4,9 +4,10 @@ import json
 import logging
 import os
 import random
+from collections.abc import Iterator
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Iterator, Optional
+from typing import Any
 
 import torch
 from torch.utils.data import Dataset
@@ -41,7 +42,7 @@ class StreamingDataset(Dataset):
         data_iterator: Iterator[dict],
         tokenizer,
         max_length: int = 2048,
-        max_samples: Optional[int] = None,
+        max_samples: int | None = None,
     ):
         self.tokenizer = tokenizer
         self.max_length = max_length
@@ -101,7 +102,7 @@ class TransformersTrainerConfig:
     lora_dropout: float = 0.05
     batch_size: int = 2
     max_seq_length: int = 2048
-    max_samples: Optional[int] = None
+    max_samples: int | None = None
     warmup_steps: int = 100
     weight_decay: float = 0.01
     max_grad_norm: float = 1.0
@@ -120,11 +121,11 @@ class TransformersTrainer(TrainerBase):
     def __init__(
         self,
         model_path: str,
-        dataset_path: Optional[str] = None,
-        output_dir: Optional[str] = None,
-        config: Optional[TransformersTrainerConfig] = None,
-        flatseek_provider: Optional[Any] = None,
-        flatseek_query: Optional[str] = None,
+        dataset_path: str | None = None,
+        output_dir: str | None = None,
+        config: TransformersTrainerConfig | None = None,
+        flatseek_provider: Any | None = None,
+        flatseek_query: str | None = None,
     ):
         """Initialize transformers trainer."""
         super().__init__(
@@ -219,7 +220,7 @@ class TransformersTrainer(TrainerBase):
 
         logger.info(f"Applying LoRA (rank={self.config.lora_rank}, alpha={self.config.lora_alpha})")
 
-        from peft import LoraConfig, get_peft_model, TaskType
+        from peft import LoraConfig, TaskType, get_peft_model
 
         lora_config = LoraConfig(
             task_type=TaskType.CAUSAL_LM,
@@ -373,7 +374,7 @@ class TransformersTrainer(TrainerBase):
 
     def _load_jsonl(self, path: str) -> Iterator[dict]:
         """Load JSONL file as iterator."""
-        with open(path, 'r') as f:
+        with open(path) as f:
             for line in f:
                 if line.strip():
                     yield json.loads(line.strip())
@@ -405,7 +406,7 @@ class TransformersTrainer(TrainerBase):
         logger.info(f"Merged model saved to {merged_path}")
         return merged_path
 
-    def export(self, format: str, output_dir: Optional[str] = None) -> Path:
+    def export(self, format: str, output_dir: str | None = None) -> Path:
         """Export model to target format."""
         from flattune.exporter import ModelExporter
 

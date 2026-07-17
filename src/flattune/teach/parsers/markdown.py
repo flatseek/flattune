@@ -1,8 +1,8 @@
 """Markdown parser."""
 
 import re
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Iterator
 
 from flattune.teach.parsers.base import BaseParser, ParseResult
 from flattune.teach.registry import SourceType, register_parser
@@ -29,7 +29,7 @@ class MarkdownParser(BaseParser):
         path = Path(source_str)
 
         try:
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 content = f.read()
         except Exception as e:
             yield ParseResult(
@@ -87,7 +87,7 @@ class MarkdownParser(BaseParser):
                     sections.append((current_title, "\n".join(current_content)))
 
                 # Start new section
-                level = len(header_match.group(1))
+                len(header_match.group(1))
                 current_title = header_match.group(2).strip()
                 current_content = [line]
             else:

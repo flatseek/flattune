@@ -9,10 +9,11 @@ This module provides a structured intermediate representation that is:
 from __future__ import annotations
 
 import uuid
+from collections.abc import Iterator
 from dataclasses import dataclass, field
 from datetime import datetime
 from enum import Enum
-from typing import Any, Iterator, Optional
+from typing import Any
 
 
 class NodeType(Enum):
@@ -62,9 +63,9 @@ class KnowledgeNode:
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
     node_type: NodeType = NodeType.DOCUMENT
     content: str = ""
-    summary: Optional[str] = None
-    source: Optional[str] = None
-    source_line: Optional[int] = None
+    summary: str | None = None
+    source: str | None = None
+    source_line: int | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
     properties: dict[str, Any] = field(default_factory=dict)
     edges: list[tuple[str, EdgeType, str]] = field(default_factory=list)  # (target_id, edge_type, label)
@@ -178,7 +179,7 @@ class KnowledgeGraph:
         if source_id in self.nodes and target_id in self.nodes:
             self.nodes[source_id].edges.append((target_id, edge_type, label))
 
-    def get_node(self, node_id: str) -> Optional[KnowledgeNode]:
+    def get_node(self, node_id: str) -> KnowledgeNode | None:
         """Get a node by ID.
 
         Args:
@@ -200,7 +201,7 @@ class KnowledgeGraph:
         """
         return [n for n in self.nodes.values() if n.node_type == node_type]
 
-    def get_related(self, node_id: str, edge_type: Optional[EdgeType] = None) -> list[KnowledgeNode]:
+    def get_related(self, node_id: str, edge_type: EdgeType | None = None) -> list[KnowledgeNode]:
         """Get nodes related to a given node.
 
         Args:
@@ -223,7 +224,7 @@ class KnowledgeGraph:
 
         return related
 
-    def iterate(self, node_type: Optional[NodeType] = None) -> Iterator[KnowledgeNode]:
+    def iterate(self, node_type: NodeType | None = None) -> Iterator[KnowledgeNode]:
         """Iterate over nodes.
 
         Args:
@@ -282,7 +283,7 @@ class KnowledgeGraph:
 class KnowledgeGraphBuilder:
     """Builder for constructing knowledge graphs from parsed content."""
 
-    def __init__(self, source: Optional[str] = None):
+    def __init__(self, source: str | None = None):
         """Initialize the builder.
 
         Args:
@@ -294,7 +295,7 @@ class KnowledgeGraphBuilder:
     def add_document(
         self,
         content: str,
-        metadata: Optional[dict[str, Any]] = None,
+        metadata: dict[str, Any] | None = None,
     ) -> KnowledgeNode:
         """Add a document node.
 
@@ -316,8 +317,8 @@ class KnowledgeGraphBuilder:
     def add_section(
         self,
         content: str,
-        parent_id: Optional[str] = None,
-        metadata: Optional[dict[str, Any]] = None,
+        parent_id: str | None = None,
+        metadata: dict[str, Any] | None = None,
     ) -> KnowledgeNode:
         """Add a section node.
 
@@ -347,9 +348,9 @@ class KnowledgeGraphBuilder:
         method: str,
         path: str,
         summary: str,
-        parameters: Optional[list[dict]] = None,
-        request_body: Optional[dict] = None,
-        responses: Optional[dict] = None,
+        parameters: list[dict] | None = None,
+        request_body: dict | None = None,
+        responses: dict | None = None,
     ) -> KnowledgeNode:
         """Add an API endpoint node.
 
@@ -396,8 +397,8 @@ class KnowledgeGraphBuilder:
         self,
         name: str,
         description: str,
-        parameters: Optional[list[dict]] = None,
-        examples: Optional[list[str]] = None,
+        parameters: list[dict] | None = None,
+        examples: list[str] | None = None,
     ) -> KnowledgeNode:
         """Add a tool/node function node.
 
@@ -441,7 +442,7 @@ class KnowledgeGraphBuilder:
     def add_database_schema(
         self,
         tables: list[dict[str, Any]],
-        relationships: Optional[list[dict[str, str]]] = None,
+        relationships: list[dict[str, str]] | None = None,
     ) -> KnowledgeNode:
         """Add a database schema node.
 

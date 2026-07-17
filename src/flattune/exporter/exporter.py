@@ -1,11 +1,8 @@
 """Model exporter for converting between model formats."""
 
-import json
-import subprocess
 from pathlib import Path
-from typing import Any, Optional
 
-from flattune.config import ExportFormat, QuantizationType
+from flattune.config import ExportFormat
 from flattune.utils.logging import get_logger
 
 logger = get_logger(__name__)
@@ -42,8 +39,8 @@ class ModelExporter:
 
     def export(
         self,
-        quantization: Optional[str] = None,
-        base_model: Optional[Path] = None,
+        quantization: str | None = None,
+        base_model: Path | None = None,
     ) -> Path:
         """Export the model to the target format.
 
@@ -70,7 +67,7 @@ class ModelExporter:
 
         raise ValueError(f"Unknown export format: {self.format}")
 
-    def _export_gguf(self, quantization: Optional[str] = None) -> Path:
+    def _export_gguf(self, quantization: str | None = None) -> Path:
         """Export to GGUF format using llama.cpp.
 
         Args:
@@ -94,10 +91,10 @@ class ModelExporter:
             output_path = self.output_dir / "model.gguf.placeholder"
             self.output_dir.mkdir(parents=True, exist_ok=True)
             with open(output_path, 'w') as f:
-                f.write(f"# GGUF Export Placeholder\n")
+                f.write("# GGUF Export Placeholder\n")
                 f.write(f"# Model: {self.model_path}\n")
                 f.write(f"# Quantization: {quantization or 'Q4_K_M'}\n")
-                f.write(f"# Install llama-cpp-python to enable GGUF export\n")
+                f.write("# Install llama-cpp-python to enable GGUF export\n")
             logger.info(f"Placeholder created at: {output_path}")
             return output_path
 
@@ -129,7 +126,7 @@ class ModelExporter:
         logger.info(f"HF merged export would save to: {output_path}")
         return output_path
 
-    def _export_hf_adapter(self, base_model: Optional[Path] = None) -> Path:
+    def _export_hf_adapter(self, base_model: Path | None = None) -> Path:
         """Export LoRA adapter only.
 
         Args:

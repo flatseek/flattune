@@ -1,7 +1,8 @@
 """Library-based FlatSeek provider using the FlatSeek Python API."""
 
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Any, Iterator, Optional
+from typing import Any
 
 from flattune.flatseek.provider import FlatseekProvider
 
@@ -25,8 +26,8 @@ class LibraryProvider(FlatseekProvider):
     def __init__(
         self,
         path: str,
-        query: Optional[str] = None,
-        encryption_key: Optional[str] = None,
+        query: str | None = None,
+        encryption_key: str | None = None,
     ):
         """Initialize the library provider.
 
@@ -52,7 +53,7 @@ class LibraryProvider(FlatseekProvider):
 
         self._engine = self._create_engine(path, encryption_key)
 
-    def _create_engine(self, path: str, encryption_key: Optional[str]):
+    def _create_engine(self, path: str, encryption_key: str | None):
         """Create a QueryEngine for the given path.
 
         Args:
@@ -97,7 +98,7 @@ class LibraryProvider(FlatseekProvider):
             return list(cols.keys())
         return cols if isinstance(cols, list) else []
 
-    def search(self, query: str, limit: Optional[int] = None) -> list[dict[str, Any]]:
+    def search(self, query: str, limit: int | None = None) -> list[dict[str, Any]]:
         """Search the index with a query.
 
         Args:
@@ -141,8 +142,7 @@ class LibraryProvider(FlatseekProvider):
             docs = result.get("results", [])
             if not docs:
                 break
-            for doc in docs:
-                yield doc
+            yield from docs
             total = result.get("total", 0)
             if (page + 1) * page_size >= total:
                 break

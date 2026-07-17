@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Any
 
 from flattune.build.registry import (
-    SourceRegistry,
     BaseSourceDetector,
     SourceDetectionResult,
     register_source,
@@ -29,7 +28,7 @@ class TextSourceDetector(BaseSourceDetector):
         path = Path(source_str)
         if "." not in path.name:
             try:
-                with open(path, "r", encoding="utf-8") as f:
+                with open(path, encoding="utf-8") as f:
                     f.read(100)
                 return True
             except (UnicodeDecodeError, PermissionError):
@@ -45,7 +44,7 @@ class TextSourceDetector(BaseSourceDetector):
         metadata: dict[str, Any] = {"filename": path.name}
 
         try:
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 sample_content = f.read(1024)
                 # Try to detect encoding
                 try:

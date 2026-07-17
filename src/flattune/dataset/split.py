@@ -3,7 +3,7 @@
 import random
 from collections import Counter
 from enum import Enum
-from typing import Any, Optional
+from typing import Any
 
 
 class SplitType(Enum):
@@ -25,7 +25,7 @@ class DatasetSplitter:
         val_ratio: float = 0.1,
         test_ratio: float = 0.1,
         seed: int = 42,
-        stratify_field: Optional[str] = None,
+        stratify_field: str | None = None,
     ):
         """Initialize the dataset splitter.
 

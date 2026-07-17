@@ -1,19 +1,18 @@
 """Automatic FlatSeek provider selection based on available backends."""
 
-from typing import Optional
 
-from flattune.flatseek.provider import FlatseekProvider
-from flattune.flatseek.library_provider import LibraryProvider
-from flattune.flatseek.cli_provider import CLIProvider
 from flattune.config import FlatseekMode, FlatseekSource
+from flattune.flatseek.cli_provider import CLIProvider
+from flattune.flatseek.library_provider import LibraryProvider
+from flattune.flatseek.provider import FlatseekProvider
 
 
 def create_provider(
     path: str,
     mode: FlatseekMode = FlatseekMode.AUTO,
     source: FlatseekSource = FlatseekSource.DIRECTORY,
-    query: Optional[str] = None,
-    encryption_key: Optional[str] = None,
+    query: str | None = None,
+    encryption_key: str | None = None,
 ) -> FlatseekProvider:
     """Create the appropriate FlatSeek provider based on available backends.
 

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from typing import Any, Optional
+from typing import Any
 
 from flattune.dataset.generators.base import BaseGenerator
 
@@ -24,7 +24,7 @@ class GlossaryGenerator(BaseGenerator):
         self,
         document: dict[str, Any],
         config: Any,
-        instruction: Optional[str] = None,
+        instruction: str | None = None,
     ) -> list[dict[str, Any]]:
         """Extract glossary terms and definitions.
 
@@ -41,7 +41,7 @@ class GlossaryGenerator(BaseGenerator):
 
         # Extract content
         content = self._extract_field(document, ["text", "content", "body", "description"])
-        title = self._extract_field(document, ["title", "name", "subject"])
+        self._extract_field(document, ["title", "name", "subject"])
 
         if not content:
             return []
@@ -62,7 +62,7 @@ class GlossaryGenerator(BaseGenerator):
                 continue
 
             # Find context around term
-            term_pattern = re.escape(term)
+            re.escape(term)
             matches = list(re.finditer(rf'.{{0,30}}{re.escape(term)}.{{0,100}}', content, re.IGNORECASE))
             for match in matches[:2]:
                 context = match.group(0).strip()

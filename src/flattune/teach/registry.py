@@ -10,10 +10,11 @@ from __future__ import annotations
 
 import logging
 from abc import ABC, abstractmethod
+from collections.abc import Iterator
 from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
-from typing import Any, Iterator, Optional, Type
+from typing import Any
 
 logger = logging.getLogger(__name__)
 
@@ -228,11 +229,11 @@ class BaseGenerator(ABC):
 class PluginRegistry(ABC):
     """Base registry for plugin management."""
 
-    _plugins: dict[str, Type] = {}
+    _plugins: dict[str, type] = {}
     _aliases: dict[str, str] = {}
 
     @classmethod
-    def register(cls, name: str, plugin_class: Type, alias: Optional[str] = None) -> None:
+    def register(cls, name: str, plugin_class: type, alias: str | None = None) -> None:
         """Register a plugin.
 
         Args:
@@ -248,7 +249,7 @@ class PluginRegistry(ABC):
         logger.debug(f"Registered {cls._base_type.__name__}: {name}")
 
     @classmethod
-    def get(cls, name: str) -> Optional[Type]:
+    def get(cls, name: str) -> type | None:
         """Get a plugin by name.
 
         Args:
@@ -299,16 +300,16 @@ class ParserRegistry(PluginRegistry):
     """Registry for parser plugins."""
 
     _base_type = BaseParser
-    _plugins: dict[str, Type] = {}
+    _plugins: dict[str, type] = {}
     _aliases: dict[str, str] = {}
 
     @classmethod
-    def register(cls, name: str, plugin_class: Type, alias: Optional[str] = None) -> None:
+    def register(cls, name: str, plugin_class: type, alias: str | None = None) -> None:
         """Register a parser plugin."""
         super().register(name, plugin_class, alias)
 
     @classmethod
-    def get_for_source(cls, source: str | Path) -> Optional[Type[BaseParser]]:
+    def get_for_source(cls, source: str | Path) -> type[BaseParser] | None:
         """Get appropriate parser for a source.
 
         Args:
@@ -362,11 +363,11 @@ class TeacherRegistry(PluginRegistry):
     """Registry for teacher model plugins."""
 
     _base_type = BaseTeacher
-    _plugins: dict[str, Type] = {}
+    _plugins: dict[str, type] = {}
     _aliases: dict[str, str] = {}
 
     @classmethod
-    def register(cls, name: str, plugin_class: Type, alias: Optional[str] = None) -> None:
+    def register(cls, name: str, plugin_class: type, alias: str | None = None) -> None:
         """Register a teacher plugin."""
         super().register(name, plugin_class, alias)
 
@@ -391,16 +392,16 @@ class GeneratorRegistry(PluginRegistry):
     """Registry for generator plugins."""
 
     _base_type = BaseGenerator
-    _plugins: dict[str, Type] = {}
+    _plugins: dict[str, type] = {}
     _aliases: dict[str, str] = {}
 
     @classmethod
-    def register(cls, name: str, plugin_class: Type, alias: Optional[str] = None) -> None:
+    def register(cls, name: str, plugin_class: type, alias: str | None = None) -> None:
         """Register a generator plugin."""
         super().register(name, plugin_class, alias)
 
     @classmethod
-    def get_for_type(cls, sample_type: str) -> Optional[Type[BaseGenerator]]:
+    def get_for_type(cls, sample_type: str) -> type[BaseGenerator] | None:
         """Get generator that supports a sample type.
 
         Args:
@@ -409,7 +410,7 @@ class GeneratorRegistry(PluginRegistry):
         Returns:
             Generator class or None.
         """
-        for name, gen_class in cls._plugins.items():
+        for _name, gen_class in cls._plugins.items():
             try:
                 instance = gen_class()
                 if instance.supports(sample_type):
@@ -424,7 +425,7 @@ class GeneratorRegistry(PluginRegistry):
 # ============================================================================
 
 
-def register_parser(name: str, alias: Optional[str] = None):
+def register_parser(name: str, alias: str | None = None):
     """Decorator to register a parser plugin.
 
     Usage:
@@ -432,13 +433,13 @@ def register_parser(name: str, alias: Optional[str] = None):
         class MarkdownParser(BaseParser):
             ...
     """
-    def decorator(cls: Type[BaseParser]) -> Type[BaseParser]:
+    def decorator(cls: type[BaseParser]) -> type[BaseParser]:
         ParserRegistry.register(name, cls, alias)
         return cls
     return decorator
 
 
-def register_teacher(name: str, alias: Optional[str] = None):
+def register_teacher(name: str, alias: str | None = None):
     """Decorator to register a teacher plugin.
 
     Usage:
@@ -446,13 +447,13 @@ def register_teacher(name: str, alias: Optional[str] = None):
         class OpenAITeacher(BaseTeacher):
             ...
     """
-    def decorator(cls: Type[BaseTeacher]) -> Type[BaseTeacher]:
+    def decorator(cls: type[BaseTeacher]) -> type[BaseTeacher]:
         TeacherRegistry.register(name, cls, alias)
         return cls
     return decorator
 
 
-def register_generator(name: str, alias: Optional[str] = None):
+def register_generator(name: str, alias: str | None = None):
     """Decorator to register a generator plugin.
 
     Usage:
@@ -460,7 +461,7 @@ def register_generator(name: str, alias: Optional[str] = None):
         class QAGenerator(BaseGenerator):
             ...
     """
-    def decorator(cls: Type[BaseGenerator]) -> Type[BaseGenerator]:
+    def decorator(cls: type[BaseGenerator]) -> type[BaseGenerator]:
         GeneratorRegistry.register(name, cls, alias)
         return cls
     return decorator

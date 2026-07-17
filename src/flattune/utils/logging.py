@@ -3,8 +3,6 @@
 import logging
 import sys
 from pathlib import Path
-from typing import Optional
-
 
 # Global logger configuration
 _LOG_FORMAT = "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
@@ -12,9 +10,9 @@ _DATE_FORMAT = "%Y-%m-%d %H:%M:%S"
 
 
 def setup_logging(
-    stage: Optional[str] = None,
+    stage: str | None = None,
     level: int = logging.INFO,
-    log_file: Optional[Path] = None,
+    log_file: Path | None = None,
 ) -> None:
     """Set up logging configuration.
 
@@ -63,7 +61,7 @@ class LogContext:
         self,
         logger: logging.Logger,
         stage: str,
-        message: Optional[str] = None,
+        message: str | None = None,
     ):
         """Initialize log context.
 

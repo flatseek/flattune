@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import json
-import random
 from collections import Counter
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Any, Iterator, Optional, Union
+from typing import Any
 
 from flattune.config import DatasetConfig, DatasetType, FlatseekConfig
 from flattune.dataset.generators import get_generator
@@ -65,9 +65,9 @@ class DatasetBuilder:
 
     def __init__(
         self,
-        flatseek_config: Optional[FlatseekConfig] = None,
-        dataset_config: Optional[DatasetConfig] = None,
-        output_dir: Optional[Union[str, Path]] = None,
+        flatseek_config: FlatseekConfig | None = None,
+        dataset_config: DatasetConfig | None = None,
+        output_dir: str | Path | None = None,
         interactive: bool = True,
         yes_flag: bool = False,
     ):
@@ -87,7 +87,7 @@ class DatasetBuilder:
         self.interactive = interactive and not yes_flag
         self.yes_flag = yes_flag
 
-        self.provider: Optional[FlatseekProvider] = None
+        self.provider: FlatseekProvider | None = None
 
         # Initialize generators based on config
         self.generators = self._initialize_generators()
@@ -147,7 +147,7 @@ class DatasetBuilder:
         }
         return type_map.get(name.lower(), "custom")
 
-    def connect(self) -> "DatasetBuilder":
+    def connect(self) -> DatasetBuilder:
         """Connect to the FlatSeek index.
 
         Returns:
@@ -165,11 +165,11 @@ class DatasetBuilder:
 
     def build(
         self,
-        documents: Optional[Iterator[dict[str, Any]]] = None,
+        documents: Iterator[dict[str, Any]] | None = None,
         dataset_name: str = "dataset",
-        query: Optional[str] = None,
-        source_path: Optional[str] = None,
-        user_requested_types: Optional[list[str]] = None,
+        query: str | None = None,
+        source_path: str | None = None,
+        user_requested_types: list[str] | None = None,
     ) -> dict[str, Path]:
         """Build a dataset from documents or FlatSeek index.
 
@@ -217,7 +217,7 @@ class DatasetBuilder:
         documents: Iterator[dict[str, Any]],
         dataset_name: str,
         source_path: str,
-        user_requested_types: Optional[list[str]] = None,
+        user_requested_types: list[str] | None = None,
     ) -> dict[str, Path]:
         """Build using the new intelligent pipeline.
 
@@ -259,9 +259,9 @@ class DatasetBuilder:
 
     def _build_legacy(
         self,
-        documents: Optional[Iterator[dict[str, Any]]],
+        documents: Iterator[dict[str, Any]] | None,
         dataset_name: str,
-        query: Optional[str],
+        query: str | None,
     ) -> dict[str, Path]:
         """Legacy build mode for backward compatibility.
 
@@ -318,7 +318,7 @@ class DatasetBuilder:
         logger.info(f"Dataset saved to {self.output_dir}")
         return paths
 
-    def _fetch_documents(self, query: Optional[str] = None) -> Iterator[dict[str, Any]]:
+    def _fetch_documents(self, query: str | None = None) -> Iterator[dict[str, Any]]:
         """Fetch documents from FlatSeek index.
 
         Args:
@@ -415,7 +415,7 @@ class DatasetBuilder:
 
         return True
 
-    def _generate_default_sample(self, doc: dict[str, Any]) -> Optional[dict[str, Any]]:
+    def _generate_default_sample(self, doc: dict[str, Any]) -> dict[str, Any] | None:
         """Generate a default sample from a document.
 
         Args:
@@ -663,7 +663,7 @@ class DatasetBuilder:
 
         return stats
 
-    def get_build_plan(self) -> Optional[Any]:
+    def get_build_plan(self) -> Any | None:
         """Get the build plan from the last build run.
 
         Returns:
@@ -675,9 +675,9 @@ class DatasetBuilder:
 def build_dataset(
     flatseek_config: FlatseekConfig,
     dataset_config: DatasetConfig,
-    output_dir: Optional[Union[str, Path]] = None,
+    output_dir: str | Path | None = None,
     dataset_name: str = "dataset",
-    query: Optional[str] = None,
+    query: str | None = None,
 ) -> dict[str, Path]:
     """Convenience function to build a dataset.
 

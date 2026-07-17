@@ -2,17 +2,15 @@
 
 import json
 import math
-import os
 import subprocess
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import matplotlib.pyplot as plt
 import numpy as np
 
 from flattune.trainer.base import TrainerBase
-from flattune.trainer.config import TrainConfig
 from flattune.utils.logging import get_logger
 
 logger = get_logger(__name__)
@@ -28,11 +26,11 @@ class UnslothTrainer(TrainerBase):
     def __init__(
         self,
         model_path: str,
-        dataset_path: Optional[str] = None,
-        output_dir: Optional[Path] = None,
-        config: Optional[Any] = None,
-        flatseek_provider: Optional[Any] = None,
-        flatseek_query: Optional[str] = None,
+        dataset_path: str | None = None,
+        output_dir: Path | None = None,
+        config: Any | None = None,
+        flatseek_provider: Any | None = None,
+        flatseek_query: str | None = None,
     ):
         """Initialize the Unsloth trainer.
 
@@ -78,6 +76,7 @@ class UnslothTrainer(TrainerBase):
             seed: Seed value to set.
         """
         import random
+
         import numpy as np
 
         random.seed(seed)
@@ -161,8 +160,8 @@ class UnslothTrainer(TrainerBase):
         """
         try:
             # Try using transformers with llama.cpp support
-            from transformers import AutoTokenizer, AutoModelForCausalLM
             import torch
+            from transformers import AutoModelForCausalLM, AutoTokenizer
 
             logger.info(f"Loading GGUF model from {self.model_path}")
 
@@ -188,8 +187,8 @@ class UnslothTrainer(TrainerBase):
         except Exception as e:
             logger.warning(f"Failed to load with transformers, trying llama-cpp: {e}")
             raise ImportError(
-                f"Failed to load GGUF model. Please install llama-cpp-python: "
-                f"pip install llama-cpp-python"
+                "Failed to load GGUF model. Please install llama-cpp-python: "
+                "pip install llama-cpp-python"
             ) from e
 
     def _load_huggingface_model(self) -> tuple[Any, Any]:
@@ -305,7 +304,7 @@ class UnslothTrainer(TrainerBase):
             elif "instruction" in examples and "output" in examples:
                 texts = [
                     f"Instruction: {instr}\nOutput: {out}"
-                    for instr, out in zip(examples["instruction"], examples["output"])
+                    for instr, out in zip(examples["instruction"], examples["output"], strict=False)
                 ]
             elif "messages" in examples:
                 # Chat format
@@ -350,7 +349,6 @@ class UnslothTrainer(TrainerBase):
             Trainer instance.
         """
         from transformers import TrainingArguments
-        from unsloth import FastLanguageModel
 
         # Split dataset for evaluation if possible
         try:
@@ -644,7 +642,6 @@ class UnslothTrainer(TrainerBase):
         Returns:
             Path to the merged model.
         """
-        from unsloth import FastLanguageModel
 
         logger.info("Merging LoRA adapter with base model...")
 
@@ -738,7 +735,6 @@ class UnslothTrainer(TrainerBase):
         elif format.lower() == "safetensors":
             # Export to SafeTensors format
             from safetensors.torch import save_file
-            import torch
 
             if self._model is None:
                 raise RuntimeError("Model not loaded. Run train() first.")
@@ -792,7 +788,7 @@ class UnslothTrainer(TrainerBase):
         checkpoints.extend(self.checkpoint_dir.glob("**/adapter_model.safetensors"))
         return sorted(checkpoints, key=lambda p: p.stat().st_mtime)
 
-    def get_latest_checkpoint(self) -> Optional[Path]:
+    def get_latest_checkpoint(self) -> Path | None:
         """Get the path to the latest checkpoint.
 
         Returns:

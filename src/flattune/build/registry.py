@@ -14,7 +14,7 @@ import logging
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Optional, Type
+from typing import Any
 
 from flattune.teach.registry import SourceType
 
@@ -29,11 +29,11 @@ logger = logging.getLogger(__name__)
 class PluginRegistry(ABC):
     """Base registry for plugin management."""
 
-    _plugins: dict[str, Type] = {}
+    _plugins: dict[str, type] = {}
     _aliases: dict[str, str] = {}
 
     @classmethod
-    def register(cls, name: str, plugin_class: Type, alias: Optional[str] = None) -> None:
+    def register(cls, name: str, plugin_class: type, alias: str | None = None) -> None:
         """Register a plugin.
 
         Args:
@@ -47,7 +47,7 @@ class PluginRegistry(ABC):
         logger.debug(f"Registered {cls.__name__}: {name}")
 
     @classmethod
-    def get(cls, name: str) -> Optional[Type]:
+    def get(cls, name: str) -> type | None:
         """Get a plugin by name.
 
         Args:
@@ -99,9 +99,9 @@ class SourceDetectionResult:
     """Result from detecting a source type."""
     source_type: SourceType
     confidence: float  # 0.0 to 1.0
-    detected_format: Optional[str] = None  # e.g., "jsonl", "csv", "markdown"
+    detected_format: str | None = None  # e.g., "jsonl", "csv", "markdown"
     metadata: dict[str, Any] = field(default_factory=dict)
-    sample_content: Optional[str] = None  # First ~1KB for analysis
+    sample_content: str | None = None  # First ~1KB for analysis
 
 
 class BaseSourceDetector(ABC):
@@ -137,11 +137,11 @@ class BaseSourceDetector(ABC):
 class SourceRegistry(PluginRegistry):
     """Registry for source detector plugins."""
 
-    _plugins: dict[str, Type] = {}
+    _plugins: dict[str, type] = {}
     _aliases: dict[str, str] = {}
 
     @classmethod
-    def get_for_source(cls, source: str | Path) -> Optional[Type[BaseSourceDetector]]:
+    def get_for_source(cls, source: str | Path) -> type[BaseSourceDetector] | None:
         """Get appropriate detector for a source.
 
         Args:
@@ -193,7 +193,7 @@ class SourceRegistry(PluginRegistry):
         return None
 
 
-def register_source(name: str, alias: Optional[str] = None):
+def register_source(name: str, alias: str | None = None):
     """Decorator to register a source detector plugin.
 
     Usage:
@@ -201,7 +201,7 @@ def register_source(name: str, alias: Optional[str] = None):
         class MarkdownSourceDetector(BaseSourceDetector):
             ...
     """
-    def decorator(cls: Type[BaseSourceDetector]) -> Type[BaseSourceDetector]:
+    def decorator(cls: type[BaseSourceDetector]) -> type[BaseSourceDetector]:
         SourceRegistry.register(name, cls, alias)
         return cls
     return decorator
@@ -239,7 +239,7 @@ class CategoryRegistry(PluginRegistry):
         logger.debug(f"Registered category: {name}")
 
     @classmethod
-    def get(cls, name: str) -> Optional[DatasetCategory]:
+    def get(cls, name: str) -> DatasetCategory | None:
         """Get a category by name."""
         result = cls._plugins.get(name)
         if result is None:
@@ -273,7 +273,7 @@ def register_category(name: str):
             description = "Factual, encyclopedic content"
             dataset_types = ["facts", "glossary", "concept", "definition"]
     """
-    def decorator(cls: Type[DatasetCategory]) -> Type[DatasetCategory]:
+    def decorator(cls: type[DatasetCategory]) -> type[DatasetCategory]:
         CategoryRegistry.register(name, cls)
         return cls
     return decorator
@@ -316,7 +316,7 @@ class DatasetTypeRegistry(PluginRegistry):
         logger.debug(f"Registered dataset type: {name}")
 
     @classmethod
-    def get(cls, name: str) -> Optional[DatasetType]:
+    def get(cls, name: str) -> DatasetType | None:
         """Get a dataset type by name."""
         result = cls._plugins.get(name)
         if result is None:
@@ -334,7 +334,7 @@ class DatasetTypeRegistry(PluginRegistry):
         ]
 
     @classmethod
-    def get_generator_for_type(cls, type_name: str) -> Optional[str]:
+    def get_generator_for_type(cls, type_name: str) -> str | None:
         """Get the generator name for a dataset type."""
         dt = cls.get(type_name)
         if dt is None:
@@ -359,7 +359,7 @@ def register_dataset_type(name: str, category: str, generator: str, **kwargs):
             generator_name = "facts"
             estimated_samples_per_doc = 3.0
     """
-    def decorator(cls: Type[DatasetType]) -> Type[DatasetType]:
+    def decorator(cls: type[DatasetType]) -> type[DatasetType]:
         DatasetTypeRegistry.register(name, cls)
         return cls
     return decorator

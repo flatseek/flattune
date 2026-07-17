@@ -3,9 +3,9 @@
 import json
 import time
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
-from flattune.config import BenchmarkConfig, BenchmarkBackend
+from flattune.config import BenchmarkBackend, BenchmarkConfig
 from flattune.lmstudio.client import LMStudioClient
 from flattune.ollama.client import OllamaClient
 from flattune.utils.logging import get_logger
@@ -25,7 +25,7 @@ class BenchmarkRunner:
     def __init__(
         self,
         config: BenchmarkConfig,
-        output_dir: Optional[Path] = None,
+        output_dir: Path | None = None,
     ):
         """Initialize the benchmark runner.
 
@@ -84,8 +84,8 @@ class BenchmarkRunner:
     def run(
         self,
         prompts: list[str],
-        model_path: Optional[str] = None,
-        categories: Optional[list[str]] = None,
+        model_path: str | None = None,
+        categories: list[str] | None = None,
     ) -> dict[str, Any]:
         """Run benchmark with the given prompts.
 
@@ -171,9 +171,9 @@ class BenchmarkRunner:
     def run_before_after(
         self,
         prompts: list[str],
-        model_path_before: Optional[str] = None,
-        model_path_after: Optional[str] = None,
-        categories: Optional[list[str]] = None,
+        model_path_before: str | None = None,
+        model_path_after: str | None = None,
+        categories: list[str] | None = None,
     ) -> dict[str, Any]:
         """Run benchmarks before and after fine-tuning for comparison.
 
@@ -228,8 +228,8 @@ class BenchmarkRunner:
 
     def _compare_results(
         self,
-        results_before: Optional[dict[str, Any]],
-        results_after: Optional[dict[str, Any]],
+        results_before: dict[str, Any] | None,
+        results_after: dict[str, Any] | None,
     ) -> dict[str, Any]:
         """Compare before and after benchmark results.
 
@@ -311,7 +311,7 @@ class BenchmarkRunner:
     def run_single(
         self,
         prompt: str,
-        model_path: Optional[str] = None,
+        model_path: str | None = None,
     ) -> dict[str, Any]:
         """Run a single prompt for quick testing.
 

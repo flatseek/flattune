@@ -1,7 +1,7 @@
 """QA Generator - generates question-answer pairs from knowledge."""
 
 import logging
-from typing import Any, Iterator
+from collections.abc import Iterator
 
 from flattune.teach.generators.base import GeneratedSample
 from flattune.teach.knowledge_graph import KnowledgeNode
@@ -94,7 +94,7 @@ class QAGenerator(BaseGenerator):
         if not sentences:
             sentences = [context[:500]]  # Use first 500 chars if no clear sentences
 
-        for i, sentence in enumerate(sentences[:3]):  # Max 3 Q&A pairs per source
+        for _i, sentence in enumerate(sentences[:3]):  # Max 3 Q&A pairs per source
             # Generate factual question
             yield GeneratedSample(
                 conversation=[

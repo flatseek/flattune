@@ -3,7 +3,7 @@
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 from flattune.utils.logging import get_logger
 
@@ -15,7 +15,7 @@ class BenchmarkReporter:
 
     def __init__(
         self,
-        output_dir: Optional[Path] = None,
+        output_dir: Path | None = None,
     ):
         """Initialize the benchmark reporter.
 
@@ -220,7 +220,7 @@ class BenchmarkReporter:
             if results_list:
                 lines.append("")
                 lines.append("**Sample Results:**")
-                for i, r in enumerate(results_list[:3]):
+                for _i, r in enumerate(results_list[:3]):
                     prompt = r.get("prompt", "")[:50]
                     response = r.get("response", "")[:100]
                     lines.append(f"- Prompt: \"{prompt}...\"")

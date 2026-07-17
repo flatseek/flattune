@@ -1,8 +1,8 @@
 """OpenAPI/Swagger parser."""
 
 import json
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Any, Iterator
 
 from flattune.teach.parsers.base import BaseParser, ParseResult
 from flattune.teach.registry import SourceType, register_parser
@@ -30,7 +30,7 @@ class OpenAPIParser(BaseParser):
         path = Path(source_str)
 
         try:
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 content = f.read()
 
             # Try YAML first, then JSON
@@ -65,7 +65,7 @@ class OpenAPIParser(BaseParser):
             yield ParseResult(
                 source=source_str,
                 source_type=self.source_type,
-                content=f"API Servers:\n" + "\n".join(s.get("url", "") for s in servers),
+                content="API Servers:\n" + "\n".join(s.get("url", "") for s in servers),
                 metadata=dict(metadata, **{"type": "servers"}),
             )
 

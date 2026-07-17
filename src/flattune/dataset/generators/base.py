@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
-from typing import Any, Optional
+from typing import Any
 
 
 @dataclass
@@ -45,7 +45,7 @@ class BaseGenerator(ABC):
         self,
         document: dict[str, Any],
         config: Any,
-        instruction: Optional[str] = None,
+        instruction: str | None = None,
     ) -> list[dict[str, Any]]:
         """Generate training samples from a document.
 
@@ -125,7 +125,7 @@ class BaseGenerator(ABC):
         instruction: str,
         input_text: str,
         output: str,
-        metadata: Optional[dict[str, Any]] = None,
+        metadata: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Build a standardized sample dictionary.
 

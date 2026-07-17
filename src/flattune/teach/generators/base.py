@@ -1,10 +1,8 @@
 """Base generator class."""
 
-from abc import abstractmethod
 from dataclasses import dataclass, field
-from typing import Any, Iterator
+from typing import Any
 
-from flattune.teach.knowledge_graph import KnowledgeNode
 from flattune.teach.registry import BaseGenerator
 
 __all__ = ["BaseGenerator", "GeneratedSample"]

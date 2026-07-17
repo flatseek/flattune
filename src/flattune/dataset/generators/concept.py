@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Optional
+from typing import Any
 
 from flattune.dataset.generators.base import BaseGenerator
 
@@ -23,7 +23,7 @@ class ConceptGenerator(BaseGenerator):
         self,
         document: dict[str, Any],
         config: Any,
-        instruction: Optional[str] = None,
+        instruction: str | None = None,
     ) -> list[dict[str, Any]]:
         """Generate concept explanation samples.
 

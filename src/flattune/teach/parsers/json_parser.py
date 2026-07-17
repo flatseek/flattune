@@ -1,8 +1,9 @@
 """JSON parser."""
 
 import json
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Any, Iterator
+from typing import Any
 
 from flattune.teach.parsers.base import BaseParser, ParseResult
 from flattune.teach.registry import SourceType, register_parser
@@ -29,7 +30,7 @@ class JSONParser(BaseParser):
         path = Path(source_str)
 
         try:
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 data = json.load(f)
         except Exception as e:
             yield ParseResult(
@@ -138,7 +139,7 @@ class JSONLParser(BaseParser):
         path = Path(source_str)
 
         try:
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 for i, line in enumerate(f):
                     if line.strip():
                         try:

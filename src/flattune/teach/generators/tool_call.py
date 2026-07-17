@@ -3,7 +3,7 @@
 import json
 import logging
 import re
-from typing import Any, Iterator
+from collections.abc import Iterator
 
 from flattune.teach.generators.base import BaseGenerator, GeneratedSample
 from flattune.teach.knowledge_graph import KnowledgeNode

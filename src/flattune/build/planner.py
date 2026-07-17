@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass, field, asdict
-from typing import Any, Optional
+from dataclasses import dataclass, field
+from typing import Any
 
+from flattune.build.analyzer import AnalysisResult
 from flattune.build.registry import (
     DatasetTypeRegistry,
     SourceDetectionResult,
 )
-from flattune.build.analyzer import AnalysisResult
 from flattune.teach.registry import SourceType
 
 
@@ -59,7 +59,7 @@ class BuildPlan:
         return json.dumps(self.to_display_dict(), indent=2)
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "BuildPlan":
+    def from_dict(cls, data: dict[str, Any]) -> BuildPlan:
         """Create BuildPlan from dictionary."""
         return cls(
             source=data["source"],
@@ -95,8 +95,8 @@ class BuildPlanner:
         detection_result: SourceDetectionResult,
         analysis_result: AnalysisResult,
         document_count: int,
-        user_requested_types: Optional[list[str]] = None,
-        force_types: Optional[list[str]] = None,
+        user_requested_types: list[str] | None = None,
+        force_types: list[str] | None = None,
     ) -> BuildPlan:
         """Create a build plan from analysis.
 
@@ -137,7 +137,7 @@ class BuildPlanner:
                     # Try to find generator for unknown type
                     from flattune.dataset.generators import get_generator
                     try:
-                        gen = get_generator(type_name)
+                        get_generator(type_name)
                         selected_types.append(TypeSelection(
                             type_name=type_name,
                             confidence=1.0,

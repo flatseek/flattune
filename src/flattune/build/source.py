@@ -1,7 +1,6 @@
 """Source detection for the build pipeline."""
 
 from pathlib import Path
-from typing import Iterator, Union
 
 from flattune.build.registry import SourceDetectionResult, SourceRegistry
 from flattune.teach.registry import SourceType
@@ -36,7 +35,7 @@ class SourceDetector:
         ".xml": SourceType.HTML,  # XML treated as HTML-like
     }
 
-    def detect(self, source: Union[str, Path]) -> SourceDetectionResult:
+    def detect(self, source: str | Path) -> SourceDetectionResult:
         """Detect source type from path or URL.
 
         Args:
@@ -79,7 +78,7 @@ class SourceDetector:
         path = Path(source_str)
         if path.exists() and path.is_file():
             try:
-                with open(path, "r", encoding="utf-8") as f:
+                with open(path, encoding="utf-8") as f:
                     content = f.read(512)
                     # Heuristics for text content
                     if content:
@@ -102,7 +101,7 @@ class SourceDetector:
             detected_format="unknown",
         )
 
-    def detect_multiple(self, sources: list[Union[str, Path]]) -> list[SourceDetectionResult]:
+    def detect_multiple(self, sources: list[str | Path]) -> list[SourceDetectionResult]:
         """Detect multiple sources.
 
         Args:
@@ -113,7 +112,7 @@ class SourceDetector:
         """
         return [self.detect(s) for s in sources]
 
-    def detect_from_directory(self, directory: Union[str, Path]) -> list[SourceDetectionResult]:
+    def detect_from_directory(self, directory: str | Path) -> list[SourceDetectionResult]:
         """Detect all files in a directory.
 
         Args:

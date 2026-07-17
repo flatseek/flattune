@@ -8,23 +8,24 @@ from __future__ import annotations
 
 import json
 import logging
+from collections.abc import Iterator
 from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Iterator, Optional
+from typing import Any
 
 from flattune.teach.knowledge_graph import KnowledgeGraph, KnowledgeNode
+from flattune.teach.quality.deduplication import Deduplicator
+from flattune.teach.quality.scoring import QualityScorer
 from flattune.teach.registry import (
     BaseGenerator,
     BaseParser,
     BaseTeacher,
     GeneratorRegistry,
     ParserRegistry,
-    TeacherRegistry,
     SourceType,
+    TeacherRegistry,
 )
-from flattune.teach.quality.deduplication import Deduplicator
-from flattune.teach.quality.scoring import QualityScorer
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +35,7 @@ class PipelineConfig:
     """Configuration for the teach pipeline."""
     # Parser settings
     parser: str = "auto"  # "auto" or specific parser name
-    source_type: Optional[SourceType] = None
+    source_type: SourceType | None = None
 
     # Teacher settings
     teacher: str = "openai"
@@ -53,22 +54,22 @@ class PipelineConfig:
 
     # Output settings
     output_format: str = "jsonl"  # jsonl, sharegpt, alpaca
-    output_dir: Optional[Path] = None
+    output_dir: Path | None = None
     # System prompt for RAG inference — generates a single .prompt file
     # containing a formatted multiline prompt (not injected into jsonl samples).
     # Usage: loaded at inference time and POST-inserted with the user query.
-    system_prompt: Optional[str] = None
+    system_prompt: str | None = None
 
     # Batch settings
     batch_size: int = 10
-    max_samples: Optional[int] = None
+    max_samples: int | None = None
 
 
 @dataclass
 class PipelineStats:
     """Statistics from pipeline execution."""
     start_time: datetime = field(default_factory=datetime.now)
-    end_time: Optional[datetime] = None
+    end_time: datetime | None = None
     sources_processed: int = 0
     nodes_created: int = 0
     samples_generated: int = 0
@@ -106,9 +107,9 @@ class TeachPipeline:
 
     def __init__(
         self,
-        config: Optional[PipelineConfig] = None,
-        teacher: Optional[BaseTeacher] = None,
-        generator: Optional[BaseGenerator] = None,
+        config: PipelineConfig | None = None,
+        teacher: BaseTeacher | None = None,
+        generator: BaseGenerator | None = None,
         distill_mode: bool = False,
     ):
         """Initialize the pipeline.
@@ -186,7 +187,7 @@ class TeachPipeline:
     def run(
         self,
         sources: list[str | Path],
-        output_path: Optional[Path] = None,
+        output_path: Path | None = None,
     ) -> Iterator[dict[str, Any]]:
         """Run the complete pipeline.
 
@@ -229,7 +230,7 @@ class TeachPipeline:
     def _process_source(
         self,
         source: str | Path,
-        output_file: Optional[Any] = None,
+        output_file: Any | None = None,
     ) -> Iterator[dict[str, Any]]:
         """Process a single source.
 
@@ -283,7 +284,7 @@ class TeachPipeline:
                 logger.info(f"Reached max_samples limit: {self.config.max_samples}")
                 return
 
-    def _get_parser(self, source: str) -> Optional[BaseParser]:
+    def _get_parser(self, source: str) -> BaseParser | None:
         """Get appropriate parser for source.
 
         Args:
@@ -315,7 +316,8 @@ class TeachPipeline:
         Yields:
             KnowledgeNode objects.
         """
-        from flattune.teach.knowledge_graph import KnowledgeNode as KN, NodeType
+        from flattune.teach.knowledge_graph import KnowledgeNode as KN
+        from flattune.teach.knowledge_graph import NodeType
 
         # Create main content node
         node = KN(
@@ -384,7 +386,7 @@ class TeachPipeline:
         source_str = str(sources[0])
         path = Path(source_str)
 
-        if not path.suffix.lower() in (".json", ".yaml", ".yml"):
+        if path.suffix.lower() not in (".json", ".yaml", ".yml"):
             return ""
 
         try:
@@ -472,7 +474,7 @@ class TeachPipeline:
                     rb = operation.get("requestBody", {})
                     if rb:
                         content = rb.get("content", {})
-                        for mt, media in content.items():
+                        for _mt, media in content.items():
                             schema = media.get("schema", {})
                             props = schema.get("properties", {})
                             if props:
@@ -577,7 +579,7 @@ def teach_knowledge(
 def teach_software(
     sources: list[str],
     output_path: str,
-    sample_types: Optional[list[str]] = None,
+    sample_types: list[str] | None = None,
     **kwargs,
 ) -> PipelineStats:
     """Teach software APIs and tools.

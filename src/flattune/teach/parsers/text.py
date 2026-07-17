@@ -1,7 +1,7 @@
 """Text parser."""
 
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Iterator
 
 from flattune.teach.parsers.base import BaseParser, ParseResult
 from flattune.teach.registry import SourceType, register_parser
@@ -28,7 +28,7 @@ class TextParser(BaseParser):
         path = Path(source_str)
 
         try:
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 content = f.read()
         except Exception as e:
             yield ParseResult(
@@ -82,7 +82,7 @@ class CSVParser(BaseParser):
         path = Path(source_str)
 
         try:
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 lines = f.readlines()
         except Exception as e:
             yield ParseResult(
@@ -110,7 +110,7 @@ class CSVParser(BaseParser):
             if len(values) != len(header):
                 continue
 
-            row_data = dict(zip(header, values))
+            row_data = dict(zip(header, values, strict=False))
 
             # Format as structured text
             content = "\n".join(f"{k}: {v}" for k, v in row_data.items() if v)

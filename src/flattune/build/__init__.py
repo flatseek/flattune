@@ -7,24 +7,24 @@ This module provides an intelligent dataset planning system that:
 - Is fully extensible via registries for third-party plugins
 """
 
+from flattune.build.analyzer import AnalysisResult, ContentAnalyzer
+from flattune.build.approval import ApprovalResult, InteractiveApproval
+from flattune.build.exporter import BuildExporter
+from flattune.build.pipeline import BuildPipeline
+from flattune.build.planner import BuildPlan, BuildPlanner, TypeSelection
 from flattune.build.registry import (
+    BaseSourceDetector,
+    CategoryRegistry,
     DatasetCategory,
     DatasetType,
-    CategoryRegistry,
     DatasetTypeRegistry,
-    SourceRegistry,
-    BaseSourceDetector,
     SourceDetectionResult,
-    register_source,
+    SourceRegistry,
     register_category,
     register_dataset_type,
+    register_source,
 )
 from flattune.build.source import SourceDetector
-from flattune.build.analyzer import ContentAnalyzer, AnalysisResult
-from flattune.build.planner import BuildPlanner, BuildPlan, TypeSelection
-from flattune.build.approval import InteractiveApproval, ApprovalResult
-from flattune.build.pipeline import BuildPipeline
-from flattune.build.exporter import BuildExporter
 
 __all__ = [
     # Registry classes

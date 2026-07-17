@@ -1,16 +1,12 @@
 """Teach CLI commands - Knowledge & Skill Compiler."""
 
-import json
-import logging
 from pathlib import Path
-from typing import Optional
 
 import click
 
-from flattune.teach.pipeline import TeachPipeline, PipelineConfig
-from flattune.teach.registry import ParserRegistry, TeacherRegistry, GeneratorRegistry
-from flattune.teach.knowledge_graph import KnowledgeGraphBuilder, NodeType
-from flattune.utils.logging import setup_logging, get_logger
+from flattune.teach.pipeline import PipelineConfig, TeachPipeline
+from flattune.teach.registry import GeneratorRegistry, ParserRegistry, TeacherRegistry
+from flattune.utils.logging import get_logger, setup_logging
 
 logger = get_logger(__name__)
 
@@ -67,7 +63,7 @@ def knowledge(sources, output, teacher, model, sample_types, max_samples, min_qu
     count = 0
 
     try:
-        for sample in pipeline.run(list(sources), output_path):
+        for _sample in pipeline.run(list(sources), output_path):
             count += 1
             if count % 100 == 0:
                 click.echo(f"[teach] Generated {count} samples...")
@@ -118,7 +114,7 @@ def software(sources, output, teacher, model, sample_types, distill, system_prom
     count = 0
 
     try:
-        for sample in pipeline.run(list(sources), output_path):
+        for _sample in pipeline.run(list(sources), output_path):
             count += 1
             if count % 100 == 0:
                 click.echo(f"[teach] Generated {count} samples...")
@@ -157,13 +153,13 @@ def database(schema, output, teacher, model, distill):
     pipeline = TeachPipeline(config, distill_mode=distill)
 
     click.echo(f"[teach] Processing database schema: {schema} (distill={distill})")
-    click.echo(f"[teach] Sample types: nl_to_sql, sql")
+    click.echo("[teach] Sample types: nl_to_sql, sql")
 
     output_path = Path(output)
     count = 0
 
     try:
-        for sample in pipeline.run([schema], output_path):
+        for _sample in pipeline.run([schema], output_path):
             count += 1
             if count % 100 == 0:
                 click.echo(f"[teach] Generated {count} samples...")
@@ -202,13 +198,13 @@ def openapi(spec, output, teacher, model, distill):
     pipeline = TeachPipeline(config, distill_mode=distill)
 
     click.echo(f"[teach] Processing OpenAPI spec: {spec} (distill={distill})")
-    click.echo(f"[teach] Generating diverse API interaction examples...")
+    click.echo("[teach] Generating diverse API interaction examples...")
 
     output_path = Path(output)
     count = 0
 
     try:
-        for sample in pipeline.run([spec], output_path):
+        for _sample in pipeline.run([spec], output_path):
             count += 1
             if count % 100 == 0:
                 click.echo(f"[teach] Generated {count} samples...")
@@ -247,13 +243,13 @@ def mcp(server, output, teacher, model, distill):
     pipeline = TeachPipeline(config, distill_mode=distill)
 
     click.echo(f"[teach] Processing MCP server: {server} (distill={distill})")
-    click.echo(f"[teach] Generating tool workflow examples...")
+    click.echo("[teach] Generating tool workflow examples...")
 
     output_path = Path(output)
     count = 0
 
     try:
-        for sample in pipeline.run([server], output_path):
+        for _sample in pipeline.run([server], output_path):
             count += 1
             if count % 100 == 0:
                 click.echo(f"[teach] Generated {count} samples...")
@@ -319,7 +315,7 @@ def list_teachers():
     """List all available teacher models."""
     teachers = TeacherRegistry.list_plugins()
     local = TeacherRegistry.list_local_teachers()
-    remote = TeacherRegistry.list_remote_teachers()
+    TeacherRegistry.list_remote_teachers()
 
     click.echo("[teach] Available teachers:")
     for t in teachers:

@@ -3,22 +3,22 @@
 from __future__ import annotations
 
 import logging
+from collections.abc import Iterator
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any, Callable, Iterator, Optional, Union
+from typing import Any
 
+from flattune.build.analyzer import AnalysisResult, ContentAnalyzer
+from flattune.build.approval import ApprovalResult, InteractiveApproval
+from flattune.build.exporter import BuildExporter
+from flattune.build.planner import BuildPlan, BuildPlanner
 from flattune.build.registry import (
     DatasetTypeRegistry,
     SourceDetectionResult,
 )
 from flattune.build.source import SourceDetector
-from flattune.build.analyzer import ContentAnalyzer, AnalysisResult
-from flattune.build.planner import BuildPlanner, BuildPlan, TypeSelection
-from flattune.build.approval import InteractiveApproval, ApprovalResult
-from flattune.build.exporter import BuildExporter
 from flattune.dataset.generators import get_generator
 from flattune.dataset.split import DatasetSplitter
-from flattune.teach.registry import SourceType
 
 logger = logging.getLogger(__name__)
 
@@ -49,9 +49,9 @@ class BuildPipeline:
 
     def __init__(
         self,
-        source: Union[str, Path],
-        config: Optional[Any] = None,
-        output_dir: Optional[Path] = None,
+        source: str | Path,
+        config: Any | None = None,
+        output_dir: Path | None = None,
         interactive: bool = True,
         yes_flag: bool = False,
     ):
@@ -80,20 +80,20 @@ class BuildPipeline:
         self.splitter = DatasetSplitter()
 
         # State
-        self.detection_result: Optional[SourceDetectionResult] = None
-        self.analysis_result: Optional[AnalysisResult] = None
-        self.build_plan: Optional[BuildPlan] = None
-        self.approval_result: Optional[ApprovalResult] = None
+        self.detection_result: SourceDetectionResult | None = None
+        self.analysis_result: AnalysisResult | None = None
+        self.build_plan: BuildPlan | None = None
+        self.approval_result: ApprovalResult | None = None
         self.stats = PipelineStats()
 
         # Read sample content lazily
-        self._sample_content: Optional[str] = None
+        self._sample_content: str | None = None
 
     def run(
         self,
         documents: Iterator[dict[str, Any]],
-        user_requested_types: Optional[list[str]] = None,
-        force_types: Optional[list[str]] = None,
+        user_requested_types: list[str] | None = None,
+        force_types: list[str] | None = None,
     ) -> dict[str, Path]:
         """Run the complete pipeline.
 
@@ -154,8 +154,8 @@ class BuildPipeline:
     def _stage_build_planning(
         self,
         doc_count: int,
-        user_requested_types: Optional[list[str]] = None,
-        force_types: Optional[list[str]] = None,
+        user_requested_types: list[str] | None = None,
+        force_types: list[str] | None = None,
     ) -> None:
         """Stage 3: Create build plan."""
         logger.info("Creating build plan...")
@@ -266,7 +266,7 @@ class BuildPipeline:
             if path.exists() and path.is_file():
                 # Check if it's a text file we can read
                 if path.suffix.lower() in [".md", ".txt", ".json", ".jsonl", ".yaml", ".yml", ".csv"]:
-                    with open(path, "r", encoding="utf-8") as f:
+                    with open(path, encoding="utf-8") as f:
                         self._sample_content = f.read(4096)
         except Exception as e:
             logger.debug(f"Could not read sample content: {e}")

@@ -1,7 +1,8 @@
 """Base provider interface for FlatSeek integration."""
 
 from abc import ABC, abstractmethod
-from typing import Any, Iterator, Optional
+from collections.abc import Iterator
+from typing import Any
 
 
 class FlatseekProvider(ABC):
@@ -22,7 +23,7 @@ class FlatseekProvider(ABC):
         pass
 
     @abstractmethod
-    def search(self, query: str, limit: Optional[int] = None) -> list[dict[str, Any]]:
+    def search(self, query: str, limit: int | None = None) -> list[dict[str, Any]]:
         """Search the index with a query.
 
         Args:

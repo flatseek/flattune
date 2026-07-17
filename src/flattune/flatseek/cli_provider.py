@@ -2,7 +2,8 @@
 
 import json
 import subprocess
-from typing import Any, Iterator, Optional
+from collections.abc import Iterator
+from typing import Any
 
 from flattune.flatseek.provider import FlatseekProvider
 
@@ -17,8 +18,8 @@ class CLIProvider(FlatseekProvider):
     def __init__(
         self,
         path: str,
-        query: Optional[str] = None,
-        encryption_key: Optional[str] = None,
+        query: str | None = None,
+        encryption_key: str | None = None,
     ):
         """Initialize the CLI provider.
 
@@ -98,7 +99,7 @@ class CLIProvider(FlatseekProvider):
         # Fallback: try to get columns from first result if available
         return []
 
-    def search(self, query: str, limit: Optional[int] = None) -> list[dict[str, Any]]:
+    def search(self, query: str, limit: int | None = None) -> list[dict[str, Any]]:
         """Search the index with a query.
 
         Uses: flatseek search <data_dir> [query] [-n page_size]
@@ -211,8 +212,7 @@ class CLIProvider(FlatseekProvider):
             if not docs:
                 break
 
-            for doc in docs:
-                yield doc
+            yield from docs
 
             if len(docs) < batch_size:
                 break

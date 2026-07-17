@@ -4,7 +4,7 @@ import shutil
 import tempfile
 import time
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import requests
 
@@ -23,7 +23,7 @@ class OllamaClient:
     def __init__(
         self,
         base_url: str = "http://localhost:11434",
-        model_name: Optional[str] = None,
+        model_name: str | None = None,
     ):
         """Initialize the Ollama client.
 
@@ -34,7 +34,7 @@ class OllamaClient:
         self.base_url = base_url.rstrip("/")
         self.model_name = model_name or "llama2"
         self._session = requests.Session()
-        self._temp_dir: Optional[Path] = None
+        self._temp_dir: Path | None = None
 
     def is_available(self) -> bool:
         """Check if Ollama is running and accessible.
@@ -109,8 +109,8 @@ class OllamaClient:
         model_name: str,
         base_model: str,
         model_path: str,
-        system: Optional[str] = None,
-        parameters: Optional[dict[str, Any]] = None,
+        system: str | None = None,
+        parameters: dict[str, Any] | None = None,
     ) -> str:
         """Create a Modelfile for importing a local model.
 
@@ -148,7 +148,7 @@ PARAMETER model {model_path}
         model_name: str,
         model_path: str,
         base_model: str = "llama2",
-        system: Optional[str] = None,
+        system: str | None = None,
     ) -> bool:
         """Import a local model into Ollama.
 
@@ -204,11 +204,11 @@ PARAMETER model {model_path}
     def run_prompt(
         self,
         prompt: str,
-        model: Optional[str] = None,
-        system: Optional[str] = None,
+        model: str | None = None,
+        system: str | None = None,
         max_tokens: int = 512,
         temperature: float = 0.7,
-        stop: Optional[list[str]] = None,
+        stop: list[str] | None = None,
     ) -> dict[str, Any]:
         """Generate text using a model.
 
@@ -247,11 +247,11 @@ PARAMETER model {model_path}
     def generate(
         self,
         prompt: str,
-        model: Optional[str] = None,
+        model: str | None = None,
         max_tokens: int = 512,
         temperature: float = 0.7,
-        stop: Optional[list[str]] = None,
-        options: Optional[dict[str, Any]] = None,
+        stop: list[str] | None = None,
+        options: dict[str, Any] | None = None,
     ) -> dict[str, Any]:
         """Generate text using a model.
 
@@ -315,7 +315,7 @@ PARAMETER model {model_path}
     def chat(
         self,
         messages: list[dict[str, str]],
-        model: Optional[str] = None,
+        model: str | None = None,
         max_tokens: int = 512,
         temperature: float = 0.7,
     ) -> dict[str, Any]:
@@ -372,9 +372,9 @@ PARAMETER model {model_path}
 
     def benchmark(
         self,
-        categories: Optional[list[str]] = None,
-        prompts: Optional[list[str]] = None,
-        model: Optional[str] = None,
+        categories: list[str] | None = None,
+        prompts: list[str] | None = None,
+        model: str | None = None,
         max_tokens: int = 512,
         temperature: float = 0.7,
         num_runs: int = 10,
@@ -528,7 +528,7 @@ PARAMETER model {model_path}
         total_time = 0
 
         for prompt in prompts:
-            for run in range(num_runs):
+            for _run in range(num_runs):
                 result = self.generate(
                     prompt=prompt,
                     model=model,

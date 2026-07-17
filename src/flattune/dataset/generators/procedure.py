@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from typing import Any, Optional
+from typing import Any
 
 from flattune.dataset.generators.base import BaseGenerator
 
@@ -24,7 +24,7 @@ class ProcedureGenerator(BaseGenerator):
         self,
         document: dict[str, Any],
         config: Any,
-        instruction: Optional[str] = None,
+        instruction: str | None = None,
     ) -> list[dict[str, Any]]:
         """Generate procedure/instruction samples.
 

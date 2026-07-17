@@ -2,11 +2,8 @@
 
 from __future__ import annotations
 
-import os
 from dataclasses import dataclass, field
 from enum import Enum
-from pathlib import Path
-from typing import Any, Optional
 
 import yaml
 
@@ -88,9 +85,9 @@ class FlatseekConfig:
     """Configuration for Flatseek integration."""
     mode: FlatseekMode = FlatseekMode.AUTO
     source: FlatseekSource = FlatseekSource.DIRECTORY
-    path: Optional[str] = None
-    query: Optional[str] = None
-    encryption_key: Optional[str] = None
+    path: str | None = None
+    query: str | None = None
+    encryption_key: str | None = None
 
     def to_dict(self) -> dict:
         return {
@@ -106,9 +103,9 @@ class FlatseekConfig:
 class ModelConfig:
     """Configuration for the model."""
     source: ModelSource = ModelSource.LOCAL
-    repo: Optional[str] = None
+    repo: str | None = None
     path: str = "~/.lmstudio/models/prism-ml/Bonsai-1.7B-gguf/Bonsai-1.7B-Q1_0.gguf"
-    adapter_path: Optional[str] = None
+    adapter_path: str | None = None
 
     def to_dict(self) -> dict:
         return {
@@ -124,12 +121,12 @@ class DatasetConfig:
     """Configuration for dataset generation."""
     type: DatasetType = DatasetType.INSTRUCTION
     query: str = "*"           # Flatseek query to filter records
-    tags: Optional[list[str]] = None  # Filter by tags/categories (e.g., ["python", "rust"])
-    field_mapping: Optional[dict[str, str]] = None  # Map index fields to generator input
+    tags: list[str] | None = None  # Filter by tags/categories (e.g., ["python", "rust"])
+    field_mapping: dict[str, str] | None = None  # Map index fields to generator input
     train_split: float = 0.8
     val_split: float = 0.1
     test_split: float = 0.1
-    max_samples: Optional[int] = None
+    max_samples: int | None = None
     min_length: int = 10
     max_length: int = 2048
     generators: list[str] = field(default_factory=list)
@@ -161,7 +158,7 @@ class TrainConfig:
     lora_dropout: float = 0.05
     batch_size: int = 2
     max_seq_length: int = 2048
-    max_samples: Optional[int] = None
+    max_samples: int | None = None
     gradient_accumulation: int = 4
     warmup_steps: int = 100
     weight_decay: float = 0.01
@@ -199,7 +196,7 @@ class ExportConfig:
     """Configuration for export."""
     format: ExportFormat = ExportFormat.GGUF
     quantization: str = "Q4_K_M"
-    output_dir: Optional[str] = None
+    output_dir: str | None = None
 
     def to_dict(self) -> dict:
         return {
@@ -213,7 +210,7 @@ class ExportConfig:
 class BenchmarkConfig:
     """Configuration for benchmarking."""
     backend: BenchmarkBackend = BenchmarkBackend.LMSTUDIO
-    prompt_file: Optional[str] = None
+    prompt_file: str | None = None
     num_runs: int = 10
     max_tokens: int = 512
     temperature: float = 0.7
@@ -234,7 +231,7 @@ class BenchmarkConfig:
 class FlatTuneConfig:
     """Main configuration for FlatTune."""
     name: str = "flattune-run"
-    description: Optional[str] = None
+    description: str | None = None
     flatseek: FlatseekConfig = field(default_factory=FlatseekConfig)
     model: ModelConfig = field(default_factory=ModelConfig)
     dataset: DatasetConfig = field(default_factory=DatasetConfig)
@@ -246,7 +243,7 @@ class FlatTuneConfig:
     @classmethod
     def from_yaml(cls, path: str) -> FlatTuneConfig:
         """Load configuration from a YAML file."""
-        with open(path, "r") as f:
+        with open(path) as f:
             data = yaml.safe_load(f)
 
         if data is None:

@@ -7,16 +7,15 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from flattune.build.registry import (
+    DatasetTypeRegistry,
     SourceDetectionResult,
     SourceType,
-    CategoryRegistry,
-    DatasetTypeRegistry,
 )
 from flattune.build.sources import (
-    MarkdownSourceDetector,
-    JSONSourceDetector,
-    JSONLSourceDetector,
     FlatseekSourceDetector,
+    JSONLSourceDetector,
+    JSONSourceDetector,
+    MarkdownSourceDetector,
     TextSourceDetector,
 )
 

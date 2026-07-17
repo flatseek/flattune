@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from typing import Any, Optional
+from typing import Any
 
 from flattune.dataset.generators.base import BaseGenerator
 
@@ -24,7 +24,7 @@ class FactsGenerator(BaseGenerator):
         self,
         document: dict[str, Any],
         config: Any,
-        instruction: Optional[str] = None,
+        instruction: str | None = None,
     ) -> list[dict[str, Any]]:
         """Extract factual statements from a document.
 
@@ -41,7 +41,7 @@ class FactsGenerator(BaseGenerator):
 
         # Extract content
         content = self._extract_field(document, ["text", "content", "body", "description", "abstract"])
-        title = self._extract_field(document, ["title", "name", "subject"])
+        self._extract_field(document, ["title", "name", "subject"])
 
         if not content:
             return []

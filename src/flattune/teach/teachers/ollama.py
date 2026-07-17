@@ -1,11 +1,12 @@
 """Ollama teacher implementation for local inference."""
 
 import logging
-from typing import Any, Iterator
+from collections.abc import Iterator
+from typing import Any
 
-from flattune.teach.teachers.base import BaseTeacher
 from flattune.teach.knowledge_graph import KnowledgeNode
 from flattune.teach.registry import register_teacher
+from flattune.teach.teachers.base import BaseTeacher
 
 logger = logging.getLogger(__name__)
 

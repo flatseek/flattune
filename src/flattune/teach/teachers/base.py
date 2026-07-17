@@ -1,7 +1,8 @@
 """Base teacher class for generating training samples."""
 
 from abc import abstractmethod
-from typing import Any, Iterator
+from collections.abc import Iterator
+from typing import Any
 
 from flattune.teach.knowledge_graph import KnowledgeNode
 

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from typing import Any, Optional
+from typing import Any
 
 from flattune.dataset.generators.base import BaseGenerator
 
@@ -58,7 +58,7 @@ class QAGenerator(BaseGenerator):
         self,
         document: dict[str, Any],
         config: Any,
-        instruction: Optional[str] = None,
+        instruction: str | None = None,
     ) -> list[dict[str, Any]]:
         """Generate QA samples from a document.
 
@@ -109,7 +109,7 @@ class QAGenerator(BaseGenerator):
 
             # Add yes/no for medal/gender fields
             if field_name in ("medal", "sex", "gender"):
-                yes_no_question = f"Did this athlete win a medal?"
+                yes_no_question = "Did this athlete win a medal?"
                 if field_value and str(field_value).lower() not in ("na", "none", "none", ""):
                     answer = "Yes"
                 else:

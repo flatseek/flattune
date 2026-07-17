@@ -4,37 +4,36 @@ This module provides a plugin-based architecture for dataset generators.
 Generators are registered using the @register_generator decorator.
 """
 
-from flattune.dataset.generators.base import BaseGenerator
-
 # Import generators to trigger registration
 from flattune.dataset.generators import (
-    qa,
-    summary,
     classification,
     comparison,
+    concept,
     conversation,
-    extraction,
     custom,
-    safety,
+    extraction,
     facts,
     glossary,
-    concept,
     procedure,
+    qa,
+    safety,
+    summary,
 )
+from flattune.dataset.generators.base import BaseGenerator
+from flattune.dataset.generators.classification import ClassificationGenerator
+from flattune.dataset.generators.comparison import ComparisonGenerator
+from flattune.dataset.generators.concept import ConceptGenerator
+from flattune.dataset.generators.conversation import ConversationGenerator
+from flattune.dataset.generators.custom import CustomGenerator
+from flattune.dataset.generators.extraction import ExtractionGenerator
+from flattune.dataset.generators.facts import FactsGenerator
+from flattune.dataset.generators.glossary import GlossaryGenerator
+from flattune.dataset.generators.procedure import ProcedureGenerator
 
 # Import individual generator classes for backward compatibility
 from flattune.dataset.generators.qa import QAGenerator
-from flattune.dataset.generators.summary import SummaryGenerator
-from flattune.dataset.generators.classification import ClassificationGenerator
-from flattune.dataset.generators.comparison import ComparisonGenerator
-from flattune.dataset.generators.conversation import ConversationGenerator
-from flattune.dataset.generators.extraction import ExtractionGenerator
-from flattune.dataset.generators.custom import CustomGenerator
 from flattune.dataset.generators.safety import SafetyGenerator
-from flattune.dataset.generators.facts import FactsGenerator
-from flattune.dataset.generators.glossary import GlossaryGenerator
-from flattune.dataset.generators.concept import ConceptGenerator
-from flattune.dataset.generators.procedure import ProcedureGenerator
+from flattune.dataset.generators.summary import SummaryGenerator
 
 # Legacy dictionary registry for backward compatibility
 _LEGACY_GENERATORS = {

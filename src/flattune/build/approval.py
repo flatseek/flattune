@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from typing import Optional
 
 import click
 
@@ -19,13 +18,13 @@ class ApprovalResult:
     """Result from user approval interaction."""
     approved: bool
     selected_types: list[str]
-    modified_plan: Optional[BuildPlan] = None
+    modified_plan: BuildPlan | None = None
 
 
 class InteractiveApproval:
     """Handles interactive user approval for build plans."""
 
-    def __init__(self, planner: Optional[BuildPlanner] = None):
+    def __init__(self, planner: BuildPlanner | None = None):
         """Initialize interactive approval.
 
         Args:

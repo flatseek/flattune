@@ -5,7 +5,6 @@ from pathlib import Path
 from typing import Any
 
 from flattune.build.registry import (
-    SourceRegistry,
     BaseSourceDetector,
     SourceDetectionResult,
     register_source,
@@ -33,7 +32,7 @@ class JSONSourceDetector(BaseSourceDetector):
         metadata: dict[str, Any] = {"filename": path.name}
 
         try:
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 content = f.read(2048)
                 sample_content = content[:1024]
 

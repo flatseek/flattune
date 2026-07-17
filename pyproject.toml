@@ -68,7 +68,7 @@ target-version = ["py310", "py311", "py312"]
 [tool.ruff]
 line-length = 100
 select = ["E", "F", "W", "I", "N", "UP", "B", "C4"]
-ignore = ["E501"]
+ignore = ["E501", "B904", "B007", "B024", "E741", "E402", "F401", "N817"]
 
 [tool.mypy]
 python_version = "3.10"

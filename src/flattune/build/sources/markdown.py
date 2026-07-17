@@ -4,7 +4,6 @@ from pathlib import Path
 from typing import Any
 
 from flattune.build.registry import (
-    SourceRegistry,
     BaseSourceDetector,
     SourceDetectionResult,
     register_source,
@@ -32,7 +31,7 @@ class MarkdownSourceDetector(BaseSourceDetector):
         metadata: dict[str, Any] = {"filename": path.name}
 
         try:
-            with open(path, "r", encoding="utf-8") as f:
+            with open(path, encoding="utf-8") as f:
                 sample_content = f.read(1024)
                 # Extract frontmatter if present
                 if sample_content.startswith("---"):

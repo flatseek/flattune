@@ -1,30 +1,28 @@
 """CLI entry point for FlatTune."""
 
 import json
-import sys
 from pathlib import Path
-from typing import Optional
 
 import click
 
-from flattune.benchmark.runner import BenchmarkRunner
 from flattune.benchmark.reporter import BenchmarkReporter
-from flattune.config import FlatTuneConfig, ExportFormat, BenchmarkBackend
+from flattune.benchmark.runner import BenchmarkRunner
+from flattune.config import ExportFormat, FlatTuneConfig
 from flattune.dataset.builder import DatasetBuilder
 from flattune.exporter.exporter import ModelExporter
 from flattune.flatseek.auto import create_provider
+from flattune.teach.cli import teach as teach_group
 from flattune.trainer.factory import TrainerFactory
-from flattune.utils.logging import setup_logging, get_logger
-from flattune.utils.fs import create_run_folder, get_run_folder, ensure_dir
+from flattune.utils.fs import create_run_folder, get_run_folder
+from flattune.utils.hash import compute_dataset_hash
+from flattune.utils.logging import get_logger, setup_logging
 from flattune.utils.reproducibility import (
+    ReproducibilityContext,
+    get_environment_info,
     get_git_info,
     get_timestamp,
     set_seed,
-    get_environment_info,
-    ReproducibilityContext,
 )
-from flattune.utils.hash import compute_dataset_hash
-from flattune.teach.cli import teach as teach_group
 
 logger = get_logger(__name__)
 
@@ -45,7 +43,7 @@ cli.add_command(teach_group)
 @click.option("--yes", "-y", is_flag=True, help="Skip interactive approval and use suggested types")
 @click.option("--source", type=str, help="Source file/directory (overrides config)")
 @click.option("--types", "-t", multiple=True, help="Dataset types to generate (can specify multiple)")
-def build(config_file: str, yes: bool = False, source: Optional[str] = None, types: tuple = ()):
+def build(config_file: str, yes: bool = False, source: str | None = None, types: tuple = ()):
     """Extract data and generate dataset from Flatseek index.
 
     Now supports:
@@ -112,7 +110,7 @@ def build(config_file: str, yes: bool = False, source: Optional[str] = None, typ
         # The build pipeline will handle source detection
         documents = iter([])
 
-    click.echo(f"[build] Building dataset...")
+    click.echo("[build] Building dataset...")
     if type_list:
         click.echo(f"[build] Using specified types: {type_list}")
     elif config.dataset.generators:
@@ -147,7 +145,7 @@ def build(config_file: str, yes: bool = False, source: Optional[str] = None, typ
     with open(metadata_path, "w") as f:
         json.dump(build_metadata, f, indent=2)
 
-    click.echo(f"[build] Dataset generation complete.")
+    click.echo("[build] Dataset generation complete.")
     click.echo(f"[build] Dataset saved to: {run_folder / 'dataset'}")
     logger.info(f"Build metadata saved to {metadata_path}")
 
@@ -171,7 +169,7 @@ def train(config_file: str):
     # Load dataset paths
     dataset_dir = run_folder / "dataset"
     train_dataset = dataset_dir / f"{config.name}_train.jsonl"
-    val_dataset = dataset_dir / f"{config.name}_val.jsonl"
+    dataset_dir / f"{config.name}_val.jsonl"
 
     if not train_dataset.exists():
         raise FileNotFoundError(f"Training dataset not found: {train_dataset}")
@@ -232,7 +230,7 @@ def train(config_file: str):
     with open(checkpoints_path, "w") as f:
         json.dump(checkpoints_info, f, indent=2)
 
-    click.echo(f"[train] Training complete.")
+    click.echo("[train] Training complete.")
     click.echo(f"[train] Metrics: {json.dumps(metrics, indent=2)}")
     click.echo(f"[train] Saved {len(checkpoints)} checkpoints")
     logger.info(f"Training metadata saved to {metadata_path}")
@@ -260,7 +258,7 @@ def merge(config_file: str):
     else:
         latest_checkpoint = None
 
-    click.echo(f"[merge] Merging adapter with base model...")
+    click.echo("[merge] Merging adapter with base model...")
     click.echo(f"[merge] Base model: {config.model.path}")
     if latest_checkpoint:
         click.echo(f"[merge] Adapter checkpoint: {latest_checkpoint}")
@@ -294,7 +292,7 @@ def merge(config_file: str):
     with open(metadata_path, "w") as f:
         json.dump(merge_metadata, f, indent=2)
 
-    click.echo(f"[merge] Merge complete.")
+    click.echo("[merge] Merge complete.")
     click.echo(f"[merge] Merged model saved to: {merged_path}")
     logger.info(f"Merge metadata saved to {metadata_path}")
 
@@ -351,7 +349,7 @@ def export(config_file: str):
     with open(metadata_path, "w") as f:
         json.dump(export_metadata, f, indent=2)
 
-    click.echo(f"[export] Export complete.")
+    click.echo("[export] Export complete.")
     click.echo(f"[export] Exported model saved to: {export_path}")
     logger.info(f"Export metadata saved to {metadata_path}")
 
@@ -446,7 +444,7 @@ def benchmark(config_file: str):
     with open(summary_path, "w") as f:
         json.dump(summary, f, indent=2)
 
-    click.echo(f"[benchmark] Benchmark complete.")
+    click.echo("[benchmark] Benchmark complete.")
     click.echo(f"[benchmark] Total runs: {results.get('total_runs', 0)}")
     click.echo(f"[benchmark] Average tokens/sec: {results.get('average_tokens_per_second', 0):.2f}")
     click.echo(f"[benchmark] Report saved to: {report_path}")
@@ -601,7 +599,7 @@ def report(config_file: str):
     click.echo(f"[report] Report saved to: {report_path}")
     click.echo(f"[report] Metrics saved to: {metrics_path}")
     click.echo(f"[report] Benchmark data saved to: {benchmark_json_path}")
-    logger.info(f"Report generation complete")
+    logger.info("Report generation complete")
 
 
 @cli.command()
@@ -615,7 +613,7 @@ def run(config_file: str):
     run_folder = create_run_folder(config)
 
     logger.info(f"Run folder: {run_folder}")
-    click.echo(f"[run] Full pipeline starting...")
+    click.echo("[run] Full pipeline starting...")
     click.echo(f"[run] Run folder: {run_folder}")
     click.echo(f"[run] Config: {config_file}")
 
@@ -667,7 +665,7 @@ def run(config_file: str):
     with open(run_folder / "build_metadata.json", "w") as f:
         json.dump(build_metadata, f, indent=2)
 
-    click.echo(f"[run:build] Dataset generation complete.")
+    click.echo("[run:build] Dataset generation complete.")
 
     # Step 2: Train
     click.echo("\n" + "=" * 60)
@@ -709,7 +707,7 @@ def run(config_file: str):
     with open(run_folder / "checkpoints_info.json", "w") as f:
         json.dump(checkpoints_info, f, indent=2)
 
-    click.echo(f"[run:train] Training complete.")
+    click.echo("[run:train] Training complete.")
 
     # Step 3: Merge
     click.echo("\n" + "=" * 60)
@@ -731,7 +729,7 @@ def run(config_file: str):
     with open(run_folder / "merge_metadata.json", "w") as f:
         json.dump(merge_metadata, f, indent=2)
 
-    click.echo(f"[run:merge] Merge complete.")
+    click.echo("[run:merge] Merge complete.")
 
     # Step 4: Export
     click.echo("\n" + "=" * 60)
@@ -758,7 +756,7 @@ def run(config_file: str):
     with open(run_folder / "export_metadata.json", "w") as f:
         json.dump(export_metadata, f, indent=2)
 
-    click.echo(f"[run:export] Export complete.")
+    click.echo("[run:export] Export complete.")
 
     # Step 5: Benchmark
     click.echo("\n" + "=" * 60)
@@ -801,7 +799,7 @@ def run(config_file: str):
     with open(run_folder / "benchmark_summary.json", "w") as f:
         json.dump(summary, f, indent=2)
 
-    click.echo(f"[run:benchmark] Benchmark complete.")
+    click.echo("[run:benchmark] Benchmark complete.")
 
     # Step 6: Report
     click.echo("\n" + "=" * 60)
@@ -883,7 +881,7 @@ def run(config_file: str):
     with open(run_folder / "benchmark.json", "w") as f:
         json.dump({"summary": summary, "config": config.benchmark.to_dict()}, f, indent=2)
 
-    click.echo(f"[run:report] Report complete.")
+    click.echo("[run:report] Report complete.")
 
     # Final summary
     click.echo("\n" + "=" * 60)

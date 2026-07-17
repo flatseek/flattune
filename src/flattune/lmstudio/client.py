@@ -1,9 +1,8 @@
 """LM Studio client for model management and benchmarking."""
 
-import json
 import time
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any
 
 import requests
 
@@ -22,7 +21,7 @@ class LMStudioClient:
     def __init__(
         self,
         base_url: str = "http://localhost:1234",
-        model_name: Optional[str] = None,
+        model_name: str | None = None,
     ):
         """Initialize the LM Studio client.
 
@@ -95,7 +94,7 @@ class LMStudioClient:
         """
         return self.get_model_list()
 
-    def import_model(self, gguf_path: str, model_name: Optional[str] = None) -> bool:
+    def import_model(self, gguf_path: str, model_name: str | None = None) -> bool:
         """Import a GGUF model into LM Studio.
 
         Args:
@@ -217,11 +216,11 @@ class LMStudioClient:
     def run_prompt(
         self,
         prompt: str,
-        system_prompt: Optional[str] = None,
+        system_prompt: str | None = None,
         max_tokens: int = 512,
         temperature: float = 0.7,
         top_p: float = 0.9,
-        stop: Optional[list[str]] = None,
+        stop: list[str] | None = None,
     ) -> dict[str, Any]:
         """Generate text using the loaded model.
 
@@ -261,7 +260,7 @@ class LMStudioClient:
         max_tokens: int = 512,
         temperature: float = 0.7,
         top_p: float = 0.9,
-        stop: Optional[list[str]] = None,
+        stop: list[str] | None = None,
     ) -> dict[str, Any]:
         """Generate text using the loaded model.
 
@@ -362,8 +361,8 @@ class LMStudioClient:
 
     def benchmark(
         self,
-        categories: Optional[list[str]] = None,
-        prompts: Optional[list[str]] = None,
+        categories: list[str] | None = None,
+        prompts: list[str] | None = None,
         max_tokens: int = 512,
         temperature: float = 0.7,
         num_runs: int = 10,
@@ -437,7 +436,7 @@ class LMStudioClient:
 
         # Handle list prompts - use same prompts for all categories
         if isinstance(prompts_to_use, list):
-            prompts_dict = {cat: prompts_to_use for cat in categories}
+            prompts_dict = dict.fromkeys(categories, prompts_to_use)
         else:
             prompts_dict = prompts_to_use
 
@@ -514,7 +513,7 @@ class LMStudioClient:
         total_time = 0
 
         for prompt in prompts:
-            for run in range(num_runs):
+            for _run in range(num_runs):
                 result = self.generate(
                     prompt=prompt,
                     max_tokens=max_tokens,

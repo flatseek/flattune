@@ -1,8 +1,9 @@
 """Base trainer interface for all training backends."""
 
 from abc import ABC, abstractmethod
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Any, Iterator, Optional
+from typing import Any
 
 
 class TrainerBase(ABC):
@@ -19,11 +20,11 @@ class TrainerBase(ABC):
     def __init__(
         self,
         model_path: str,
-        dataset_path: Optional[str] = None,
-        output_dir: Optional[Path] = None,
-        config: Optional[Any] = None,
-        flatseek_provider: Optional[Any] = None,
-        flatseek_query: Optional[str] = None,
+        dataset_path: str | None = None,
+        output_dir: Path | None = None,
+        config: Any | None = None,
+        flatseek_provider: Any | None = None,
+        flatseek_query: str | None = None,
     ):
         """Initialize the trainer.
 
@@ -56,7 +57,7 @@ class TrainerBase(ABC):
             yield from self.flatseek_provider.stream(self.flatseek_query)
         elif self.dataset_path:
             # Load from file
-            with open(self.dataset_path, 'r') as f:
+            with open(self.dataset_path) as f:
                 for line in f:
                     if line.strip():
                         import json
@@ -116,7 +117,7 @@ class TrainerBase(ABC):
         checkpoints.extend(self.output_dir.glob("*.bin"))
         return sorted(checkpoints, key=lambda p: p.stat().st_mtime)
 
-    def get_latest_checkpoint(self) -> Optional[Path]:
+    def get_latest_checkpoint(self) -> Path | None:
         """Get the path to the latest checkpoint.
 
         Returns:
