@@ -107,9 +107,7 @@ class DatasetBuilder:
         # Get generators from config or infer from dataset type
         gen_names = self.dataset_config.generators
         if not gen_names:
-            gen_names = self.DATASET_TYPE_GENERATORS.get(
-                self.dataset_config.type, ["custom"]
-            )
+            gen_names = self.DATASET_TYPE_GENERATORS.get(self.dataset_config.type, ["custom"])
 
         for gen_name in gen_names:
             gen_type = self._get_generator_type(gen_name)
@@ -302,14 +300,10 @@ class DatasetBuilder:
             test_samples = []
 
         # Save datasets
-        paths = self._save_datasets(
-            samples, train_samples, val_samples, test_samples, dataset_name
-        )
+        paths = self._save_datasets(samples, train_samples, val_samples, test_samples, dataset_name)
 
         # Generate and save statistics
-        stats = self._generate_statistics(
-            samples, train_samples, val_samples, test_samples
-        )
+        stats = self._generate_statistics(samples, train_samples, val_samples, test_samples)
         stats_path = self.output_dir / f"{dataset_name}_statistics.json"
         with open(stats_path, "w") as f:
             json.dump(stats, f, indent=2, ensure_ascii=False)

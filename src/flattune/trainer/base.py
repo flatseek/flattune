@@ -61,6 +61,7 @@ class TrainerBase(ABC):
                 for line in f:
                     if line.strip():
                         import json
+
                         yield json.loads(line.strip())
         else:
             raise ValueError("Either flatseek_provider or dataset_path must be provided")

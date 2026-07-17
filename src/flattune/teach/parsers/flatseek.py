@@ -98,14 +98,18 @@ class FlatseekParser(BaseParser):
 
         for key, value in record.items():
             if isinstance(value, str) and len(value) < 200:
-                entities.append({
-                    "type": key,
-                    "content": value,
-                })
+                entities.append(
+                    {
+                        "type": key,
+                        "content": value,
+                    }
+                )
             elif isinstance(value, (int, float, bool)):
-                entities.append({
-                    "type": key,
-                    "content": str(value),
-                })
+                entities.append(
+                    {
+                        "type": key,
+                        "content": str(value),
+                    }
+                )
 
         return entities

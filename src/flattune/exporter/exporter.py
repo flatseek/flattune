@@ -90,7 +90,7 @@ class ModelExporter:
             # Create placeholder
             output_path = self.output_dir / "model.gguf.placeholder"
             self.output_dir.mkdir(parents=True, exist_ok=True)
-            with open(output_path, 'w') as f:
+            with open(output_path, "w") as f:
                 f.write("# GGUF Export Placeholder\n")
                 f.write(f"# Model: {self.model_path}\n")
                 f.write(f"# Quantization: {quantization or 'Q4_K_M'}\n")

@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 def is_gguf_file(path: str) -> bool:
     """Check if a file is a GGUF model."""
     path = os.path.expanduser(path)
-    return path.endswith('.gguf') or path.endswith('.gguf.bin')
+    return path.endswith(".gguf") or path.endswith(".gguf.bin")
 
 
 class StreamingDataset(Dataset):
@@ -55,9 +55,9 @@ class StreamingDataset(Dataset):
                 break
 
             # Format: instruction, input, output
-            instruction = doc.get('instruction', '')
-            input_text = doc.get('input', '')
-            output = doc.get('output', '')
+            instruction = doc.get("instruction", "")
+            input_text = doc.get("input", "")
+            output = doc.get("output", "")
 
             # Build prompt
             if instruction:
@@ -81,20 +81,21 @@ class StreamingDataset(Dataset):
             text,
             truncation=True,
             max_length=self.max_length,
-            padding='max_length',
-            return_tensors='pt',
+            padding="max_length",
+            return_tensors="pt",
         )
 
         return {
-            'input_ids': encodings['input_ids'].squeeze(),
-            'attention_mask': encodings['attention_mask'].squeeze(),
-            'labels': encodings['input_ids'].squeeze(),
+            "input_ids": encodings["input_ids"].squeeze(),
+            "attention_mask": encodings["attention_mask"].squeeze(),
+            "labels": encodings["input_ids"].squeeze(),
         }
 
 
 @dataclass
 class TransformersTrainerConfig:
     """Configuration for transformers trainer."""
+
     epochs: int = 3
     lr: float = 2e-4
     lora_rank: int = 16
@@ -144,7 +145,7 @@ class TransformersTrainer(TrainerBase):
         """Detect available device."""
         if torch.cuda.is_available():
             return "cuda"
-        elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
+        elif hasattr(torch.backends, "mps") and torch.backends.mps.is_available():
             return "mps"
         return "cpu"
 
@@ -181,7 +182,7 @@ class TransformersTrainer(TrainerBase):
                 model_path,
                 config=config,
                 torch_dtype=torch_dtype,
-                device_map='auto' if device == "cuda" else None,
+                device_map="auto" if device == "cuda" else None,
                 trust_remote_code=True,
             )
             logger.info("Model loaded successfully")
@@ -321,7 +322,7 @@ class TransformersTrainer(TrainerBase):
         logger.info(f"Training complete. Checkpoint saved to {checkpoint_path}")
 
         return {
-            "final_loss": result.training_loss if hasattr(result, 'training_loss') else 0.0,
+            "final_loss": result.training_loss if hasattr(result, "training_loss") else 0.0,
             "checkpoint_path": str(checkpoint_path),
             "training_time": "unknown",
             "loss_history": [],
@@ -357,11 +358,11 @@ class TransformersTrainer(TrainerBase):
             "next_steps": [
                 "1. Use 'flattune export' to convert to GGUF",
                 "2. Load in LM Studio or Ollama for inference",
-                "3. Or convert GGUF to HF format for full training"
-            ]
+                "3. Or convert GGUF to HF format for full training",
+            ],
         }
 
-        with open(checkpoint_path / "training_info.json", 'w') as f:
+        with open(checkpoint_path / "training_info.json", "w") as f:
             json.dump(training_info, f, indent=2)
 
         return {
@@ -389,11 +390,9 @@ class TransformersTrainer(TrainerBase):
             adapter_path = self.output_dir / "final" / "adapter_model.safetensors"
             if adapter_path.exists():
                 from peft import PeftModel
+
                 logger.info(f"Loading adapter from {adapter_path}")
-                self.model = PeftModel.from_pretrained(
-                    self.model,
-                    str(self.output_dir / "final")
-                )
+                self.model = PeftModel.from_pretrained(self.model, str(self.output_dir / "final"))
 
         logger.info("Merging LoRA with base model...")
         merged_path = self.output_dir / "merged"

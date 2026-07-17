@@ -60,8 +60,7 @@ class TrainerFactory:
         if trainer_class is None:
             available = [b.value for b in cls._trainers.keys()]
             raise ValueError(
-                f"Unsupported training backend: {backend.value}. "
-                f"Available backends: {available}"
+                f"Unsupported training backend: {backend.value}. Available backends: {available}"
             )
 
         # Check if we need to fallback to transformers

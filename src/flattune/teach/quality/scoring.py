@@ -47,10 +47,10 @@ class QualityScorer:
 
         # Weighted average
         final_score = (
-            length_score * 0.2 +
-            diversity_score * 0.2 +
-            completeness_score * 0.3 +
-            format_score * 0.3
+            length_score * 0.2
+            + diversity_score * 0.2
+            + completeness_score * 0.3
+            + format_score * 0.3
         )
 
         return min(1.0, max(0.0, final_score))
@@ -141,7 +141,7 @@ class QualityScorer:
         if self.require_complete_sentences:
             for msg in assistant_msgs:
                 content = msg.get("content", "").strip()
-                if content and not content.endswith(('.', '!', '?', '"', "'")):
+                if content and not content.endswith((".", "!", "?", '"', "'")):
                     # Allow some flexibility
                     pass
 

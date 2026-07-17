@@ -95,17 +95,19 @@ class QAGenerator(BaseGenerator):
             question = self._get_question_for_field(field_name, value_str)
 
             # Add direct QA sample
-            samples.append({
-                "instruction": base_instruction,
-                "input": f"Question: {question}\nContext: {context}",
-                "output": value_str,
-                "metadata": {
-                    "source": document.get("_source", "unknown"),
-                    "generator": "qa",
-                    "type": "direct_qa",
-                    "field": field_name,
-                },
-            })
+            samples.append(
+                {
+                    "instruction": base_instruction,
+                    "input": f"Question: {question}\nContext: {context}",
+                    "output": value_str,
+                    "metadata": {
+                        "source": document.get("_source", "unknown"),
+                        "generator": "qa",
+                        "type": "direct_qa",
+                        "field": field_name,
+                    },
+                }
+            )
 
             # Add yes/no for medal/gender fields
             if field_name in ("medal", "sex", "gender"):
@@ -114,17 +116,19 @@ class QAGenerator(BaseGenerator):
                     answer = "Yes"
                 else:
                     answer = "No"
-                samples.append({
-                    "instruction": "Answer yes or no.",
-                    "input": f"Question: {yes_no_question}",
-                    "output": answer,
-                    "metadata": {
-                        "source": document.get("_source", "unknown"),
-                        "generator": "qa",
-                        "type": "yes_no",
-                        "field": field_name,
-                    },
-                })
+                samples.append(
+                    {
+                        "instruction": "Answer yes or no.",
+                        "input": f"Question: {yes_no_question}",
+                        "output": answer,
+                        "metadata": {
+                            "source": document.get("_source", "unknown"),
+                            "generator": "qa",
+                            "type": "yes_no",
+                            "field": field_name,
+                        },
+                    }
+                )
 
         # Add composite context QA
         if len(fields) > 1:
@@ -132,16 +136,18 @@ class QAGenerator(BaseGenerator):
             name = fields.get("name") or fields.get("title") or fields.get("event") or "this"
             composite_question = f"Tell me about {name}."
 
-            samples.append({
-                "instruction": base_instruction,
-                "input": f"Question: {composite_question}\nContext: {context}",
-                "output": str(name) if name else context[:200],
-                "metadata": {
-                    "source": document.get("_source", "unknown"),
-                    "generator": "qa",
-                    "type": "context_qa",
-                },
-            })
+            samples.append(
+                {
+                    "instruction": base_instruction,
+                    "input": f"Question: {composite_question}\nContext: {context}",
+                    "output": str(name) if name else context[:200],
+                    "metadata": {
+                        "source": document.get("_source", "unknown"),
+                        "generator": "qa",
+                        "type": "context_qa",
+                    },
+                }
+            )
 
         # Limit samples per document
         return samples[:10]

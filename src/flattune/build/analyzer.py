@@ -23,6 +23,7 @@ from flattune.build.sources import (
 @dataclass
 class AnalysisResult:
     """Result from analyzing source content."""
+
     source_type: SourceType
     content_summary: str  # Brief description of content
     suggested_categories: list[tuple[str, float]]  # (category_name, confidence)
@@ -115,7 +116,9 @@ class ContentAnalyzer:
 
         # Detect questions
         question_pattern = r"(?:^|\s)(?:what|who|where|when|why|how|is|are|can|do|does)\s+\w+\??"
-        stats["has_questions"] = bool(re.search(question_pattern, content, re.IGNORECASE | re.MULTILINE))
+        stats["has_questions"] = bool(
+            re.search(question_pattern, content, re.IGNORECASE | re.MULTILINE)
+        )
 
         # Detect numbers (potential facts)
         number_count = len(re.findall(r"\d+(?:\.\d+)?", content))
@@ -301,7 +304,7 @@ class ContentAnalyzer:
 
             # Glossary type
             elif dt.name == "glossary":
-                term_indicators = len(re.findall(r'\*\*[^*]+\*\*', content))
+                term_indicators = len(re.findall(r"\*\*[^*]+\*\*", content))
                 if term_indicators > 3:
                     type_score = max(type_score, 0.7)
                 elif stats["has_definitions"]:

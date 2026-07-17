@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class PipelineStats:
     """Statistics from a pipeline run."""
+
     sources_detected: int = 0
     documents_processed: int = 0
     samples_generated: int = 0
@@ -149,7 +150,9 @@ class BuildPipeline:
         sample = self._read_sample_content()
         logger.info("Analyzing content...")
         self.analysis_result = self.analyzer.analyze(self.detection_result, sample)
-        logger.info(f"Analysis complete: {len(self.analysis_result.suggested_types)} types suggested")
+        logger.info(
+            f"Analysis complete: {len(self.analysis_result.suggested_types)} types suggested"
+        )
 
     def _stage_build_planning(
         self,
@@ -238,9 +241,7 @@ class BuildPipeline:
                     self.stats.errors.append(f"Error generating {type_name}: {e}")
 
         # Update types generated
-        self.stats.types_generated = [
-            t for t in selected_types if samples_by_type.get(t)
-        ]
+        self.stats.types_generated = [t for t in selected_types if samples_by_type.get(t)]
 
         # Export to structured output
         logger.info("Exporting datasets...")
@@ -265,7 +266,15 @@ class BuildPipeline:
             path = Path(self.source)
             if path.exists() and path.is_file():
                 # Check if it's a text file we can read
-                if path.suffix.lower() in [".md", ".txt", ".json", ".jsonl", ".yaml", ".yml", ".csv"]:
+                if path.suffix.lower() in [
+                    ".md",
+                    ".txt",
+                    ".json",
+                    ".jsonl",
+                    ".yaml",
+                    ".yml",
+                    ".csv",
+                ]:
                     with open(path, encoding="utf-8") as f:
                         self._sample_content = f.read(4096)
         except Exception as e:

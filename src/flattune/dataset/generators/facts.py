@@ -40,7 +40,9 @@ class FactsGenerator(BaseGenerator):
         base_instruction = instruction or "Extract factual statements from the following content."
 
         # Extract content
-        content = self._extract_field(document, ["text", "content", "body", "description", "abstract"])
+        content = self._extract_field(
+            document, ["text", "content", "body", "description", "abstract"]
+        )
         self._extract_field(document, ["title", "name", "subject"])
 
         if not content:
@@ -63,23 +65,23 @@ class FactsGenerator(BaseGenerator):
             matches = re.findall(pattern, content, re.IGNORECASE)
             for match in matches[:3]:  # Limit to 3 per type
                 context_match = re.search(
-                    rf".{{0,50}}{re.escape(match)}.{{0,50}}",
-                    content,
-                    re.IGNORECASE
+                    rf".{{0,50}}{re.escape(match)}.{{0,50}}", content, re.IGNORECASE
                 )
                 if context_match:
                     context = context_match.group(0).strip()
-                    samples.append({
-                        "instruction": base_instruction,
-                        "input": f"Text: {content[:500]}",
-                        "output": context,
-                        "metadata": {
-                            "source": document.get("_source", "unknown"),
-                            "generator": "facts",
-                            "type": fact_type,
-                            "extracted_value": match,
-                        },
-                    })
+                    samples.append(
+                        {
+                            "instruction": base_instruction,
+                            "input": f"Text: {content[:500]}",
+                            "output": context,
+                            "metadata": {
+                                "source": document.get("_source", "unknown"),
+                                "generator": "facts",
+                                "type": fact_type,
+                                "extracted_value": match,
+                            },
+                        }
+                    )
 
         # Extract definitions (definition type)
         definition_patterns = [
@@ -94,29 +96,33 @@ class FactsGenerator(BaseGenerator):
             for match in matches[:2]:  # Limit to 2 per type
                 definition = match.strip()
                 if len(definition) > 10 and len(definition) < 200:
-                    samples.append({
-                        "instruction": "Provide a definition for the term used in this context.",
-                        "input": f"Text: {content[:500]}",
-                        "output": definition,
-                        "metadata": {
-                            "source": document.get("_source", "unknown"),
-                            "generator": "facts",
-                            "type": "definition",
-                            "definition_type": def_type,
-                        },
-                    })
+                    samples.append(
+                        {
+                            "instruction": "Provide a definition for the term used in this context.",
+                            "input": f"Text: {content[:500]}",
+                            "output": definition,
+                            "metadata": {
+                                "source": document.get("_source", "unknown"),
+                                "generator": "facts",
+                                "type": "definition",
+                                "definition_type": def_type,
+                            },
+                        }
+                    )
 
         # If no specific patterns found, create a general fact extraction sample
         if not samples and len(content) > 100:
-            samples.append({
-                "instruction": base_instruction,
-                "input": f"Text: {content[:500]}",
-                "output": content[:200],
-                "metadata": {
-                    "source": document.get("_source", "unknown"),
-                    "generator": "facts",
-                    "type": "general",
-                },
-            })
+            samples.append(
+                {
+                    "instruction": base_instruction,
+                    "input": f"Text: {content[:500]}",
+                    "output": content[:200],
+                    "metadata": {
+                        "source": document.get("_source", "unknown"),
+                        "generator": "facts",
+                        "type": "general",
+                    },
+                }
+            )
 
         return samples

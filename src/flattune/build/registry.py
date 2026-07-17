@@ -97,6 +97,7 @@ class PluginRegistry(ABC):
 @dataclass
 class SourceDetectionResult:
     """Result from detecting a source type."""
+
     source_type: SourceType
     confidence: float  # 0.0 to 1.0
     detected_format: str | None = None  # e.g., "jsonl", "csv", "markdown"
@@ -158,7 +159,7 @@ class SourceRegistry(PluginRegistry):
             try:
                 instance = detector_class()
                 if instance.can_handle(source_str):
-                    priority = getattr(instance, 'priority', 50)
+                    priority = getattr(instance, "priority", 50)
                     candidates.append((priority, name, detector_class))
             except Exception:
                 pass
@@ -201,9 +202,11 @@ def register_source(name: str, alias: str | None = None):
         class MarkdownSourceDetector(BaseSourceDetector):
             ...
     """
+
     def decorator(cls: type[BaseSourceDetector]) -> type[BaseSourceDetector]:
         SourceRegistry.register(name, cls, alias)
         return cls
+
     return decorator
 
 
@@ -219,9 +222,12 @@ class DatasetCategory:
     Categories are organizational only - they do not generate data.
     They group related dataset types together.
     """
+
     name: str
     description: str
-    dataset_types: list[str] = field(default_factory=list)  # Names of associated DatasetType entries
+    dataset_types: list[str] = field(
+        default_factory=list
+    )  # Names of associated DatasetType entries
     priority: int = 50  # Lower = higher priority for auto-detection
 
 
@@ -273,9 +279,11 @@ def register_category(name: str):
             description = "Factual, encyclopedic content"
             dataset_types = ["facts", "glossary", "concept", "definition"]
     """
+
     def decorator(cls: type[DatasetCategory]) -> type[DatasetCategory]:
         CategoryRegistry.register(name, cls)
         return cls
+
     return decorator
 
 
@@ -291,12 +299,15 @@ class DatasetType:
     A dataset type represents a specific output format that can be generated.
     It is bound to a specific generator that produces that type.
     """
+
     name: str
     description: str
     category: str  # Parent category name
     generator_name: str  # Which generator to use
     instruction_template: str = ""  # Jinja2 template for instruction
-    supported_sources: list[str] = field(default_factory=list)  # Which sources can produce this type
+    supported_sources: list[str] = field(
+        default_factory=list
+    )  # Which sources can produce this type
     estimated_samples_per_doc: float = 2.0  # For planning
     min_content_length: int = 50
     metadata: dict[str, Any] = field(default_factory=dict)
@@ -329,7 +340,8 @@ class DatasetTypeRegistry(PluginRegistry):
     def list_by_category(cls, category: str) -> list[str]:
         """List all dataset type names for a category."""
         return [
-            name for name in cls._plugins.keys()
+            name
+            for name in cls._plugins.keys()
             if cls.get(name) and cls.get(name).category == category
         ]
 
@@ -359,9 +371,11 @@ def register_dataset_type(name: str, category: str, generator: str, **kwargs):
             generator_name = "facts"
             estimated_samples_per_doc = 3.0
     """
+
     def decorator(cls: type[DatasetType]) -> type[DatasetType]:
         DatasetTypeRegistry.register(name, cls)
         return cls
+
     return decorator
 
 
@@ -373,259 +387,337 @@ def register_dataset_type(name: str, category: str, generator: str, **kwargs):
 def _register_builtin_categories():
     """Register built-in dataset categories."""
     # Knowledge category
-    CategoryRegistry.register("knowledge", DatasetCategory(
-        name="knowledge",
-        description="Factual, encyclopedic content",
-        dataset_types=["facts", "glossary", "concept", "definition"],
-        priority=10,
-    ))
+    CategoryRegistry.register(
+        "knowledge",
+        DatasetCategory(
+            name="knowledge",
+            description="Factual, encyclopedic content",
+            dataset_types=["facts", "glossary", "concept", "definition"],
+            priority=10,
+        ),
+    )
 
     # QA category
-    CategoryRegistry.register("qa", DatasetCategory(
-        name="qa",
-        description="Question answering datasets",
-        dataset_types=["context_qa", "direct_qa", "yes_no"],
-        priority=20,
-    ))
+    CategoryRegistry.register(
+        "qa",
+        DatasetCategory(
+            name="qa",
+            description="Question answering datasets",
+            dataset_types=["context_qa", "direct_qa", "yes_no"],
+            priority=20,
+        ),
+    )
 
     # Conversation category
-    CategoryRegistry.register("conversation", DatasetCategory(
-        name="conversation",
-        description="Dialogue-based content",
-        dataset_types=["chat", "dialogue"],
-        priority=30,
-    ))
+    CategoryRegistry.register(
+        "conversation",
+        DatasetCategory(
+            name="conversation",
+            description="Dialogue-based content",
+            dataset_types=["chat", "dialogue"],
+            priority=30,
+        ),
+    )
 
     # Instruction category
-    CategoryRegistry.register("instruction", DatasetCategory(
-        name="instruction",
-        description="Step-by-step tasks",
-        dataset_types=["procedure", "howto"],
-        priority=40,
-    ))
+    CategoryRegistry.register(
+        "instruction",
+        DatasetCategory(
+            name="instruction",
+            description="Step-by-step tasks",
+            dataset_types=["procedure", "howto"],
+            priority=40,
+        ),
+    )
 
     # Classification category
-    CategoryRegistry.register("classification", DatasetCategory(
-        name="classification",
-        description="Categorization tasks",
-        dataset_types=["topic_classify", "sentiment", "entity_classify"],
-        priority=50,
-    ))
+    CategoryRegistry.register(
+        "classification",
+        DatasetCategory(
+            name="classification",
+            description="Categorization tasks",
+            dataset_types=["topic_classify", "sentiment", "entity_classify"],
+            priority=50,
+        ),
+    )
 
     # Summary category
-    CategoryRegistry.register("summary", DatasetCategory(
-        name="summary",
-        description="Summarization tasks",
-        dataset_types=["executive_summary", "concise_summary"],
-        priority=60,
-    ))
+    CategoryRegistry.register(
+        "summary",
+        DatasetCategory(
+            name="summary",
+            description="Summarization tasks",
+            dataset_types=["executive_summary", "concise_summary"],
+            priority=60,
+        ),
+    )
 
     # Extraction category
-    CategoryRegistry.register("extraction", DatasetCategory(
-        name="extraction",
-        description="Information extraction tasks",
-        dataset_types=["key_value_extract"],
-        priority=70,
-    ))
+    CategoryRegistry.register(
+        "extraction",
+        DatasetCategory(
+            name="extraction",
+            description="Information extraction tasks",
+            dataset_types=["key_value_extract"],
+            priority=70,
+        ),
+    )
 
     # RAG category
-    CategoryRegistry.register("rag", DatasetCategory(
-        name="rag",
-        description="RAG-style QA",
-        dataset_types=["citation_qa"],
-        priority=80,
-    ))
+    CategoryRegistry.register(
+        "rag",
+        DatasetCategory(
+            name="rag",
+            description="RAG-style QA",
+            dataset_types=["citation_qa"],
+            priority=80,
+        ),
+    )
 
 
 def _register_builtin_dataset_types():
     """Register built-in dataset types."""
     # Knowledge types
-    DatasetTypeRegistry.register("facts", DatasetType(
-        name="facts",
-        description="Extract factual statements from content",
-        category="knowledge",
-        generator_name="facts",
-        instruction_template="Extract factual statements from the following content.",
-        estimated_samples_per_doc=3.0,
-        min_content_length=100,
-    ))
+    DatasetTypeRegistry.register(
+        "facts",
+        DatasetType(
+            name="facts",
+            description="Extract factual statements from content",
+            category="knowledge",
+            generator_name="facts",
+            instruction_template="Extract factual statements from the following content.",
+            estimated_samples_per_doc=3.0,
+            min_content_length=100,
+        ),
+    )
 
-    DatasetTypeRegistry.register("glossary", DatasetType(
-        name="glossary",
-        description="Extract and define terms",
-        category="knowledge",
-        generator_name="glossary",
-        instruction_template="Define the following terms.",
-        estimated_samples_per_doc=2.0,
-        min_content_length=50,
-    ))
+    DatasetTypeRegistry.register(
+        "glossary",
+        DatasetType(
+            name="glossary",
+            description="Extract and define terms",
+            category="knowledge",
+            generator_name="glossary",
+            instruction_template="Define the following terms.",
+            estimated_samples_per_doc=2.0,
+            min_content_length=50,
+        ),
+    )
 
-    DatasetTypeRegistry.register("concept", DatasetType(
-        name="concept",
-        description="Explain concepts in detail",
-        category="knowledge",
-        generator_name="concept",
-        instruction_template="Explain this concept.",
-        estimated_samples_per_doc=1.5,
-        min_content_length=100,
-    ))
+    DatasetTypeRegistry.register(
+        "concept",
+        DatasetType(
+            name="concept",
+            description="Explain concepts in detail",
+            category="knowledge",
+            generator_name="concept",
+            instruction_template="Explain this concept.",
+            estimated_samples_per_doc=1.5,
+            min_content_length=100,
+        ),
+    )
 
-    DatasetTypeRegistry.register("definition", DatasetType(
-        name="definition",
-        description="Provide clear definitions",
-        category="knowledge",
-        generator_name="definition",
-        instruction_template="Provide a definition for the following.",
-        estimated_samples_per_doc=1.0,
-        min_content_length=30,
-    ))
+    DatasetTypeRegistry.register(
+        "definition",
+        DatasetType(
+            name="definition",
+            description="Provide clear definitions",
+            category="knowledge",
+            generator_name="definition",
+            instruction_template="Provide a definition for the following.",
+            estimated_samples_per_doc=1.0,
+            min_content_length=30,
+        ),
+    )
 
     # QA types
-    DatasetTypeRegistry.register("context_qa", DatasetType(
-        name="context_qa",
-        description="Answer questions based on provided context",
-        category="qa",
-        generator_name="qa",
-        instruction_template="Answer based on the given context.",
-        estimated_samples_per_doc=4.0,
-        min_content_length=200,
-    ))
+    DatasetTypeRegistry.register(
+        "context_qa",
+        DatasetType(
+            name="context_qa",
+            description="Answer questions based on provided context",
+            category="qa",
+            generator_name="qa",
+            instruction_template="Answer based on the given context.",
+            estimated_samples_per_doc=4.0,
+            min_content_length=200,
+        ),
+    )
 
-    DatasetTypeRegistry.register("direct_qa", DatasetType(
-        name="direct_qa",
-        description="Direct question answering without context",
-        category="qa",
-        generator_name="qa",
-        instruction_template="Answer the question directly.",
-        estimated_samples_per_doc=2.0,
-        min_content_length=50,
-    ))
+    DatasetTypeRegistry.register(
+        "direct_qa",
+        DatasetType(
+            name="direct_qa",
+            description="Direct question answering without context",
+            category="qa",
+            generator_name="qa",
+            instruction_template="Answer the question directly.",
+            estimated_samples_per_doc=2.0,
+            min_content_length=50,
+        ),
+    )
 
-    DatasetTypeRegistry.register("yes_no", DatasetType(
-        name="yes_no",
-        description="Yes/No question answering",
-        category="qa",
-        generator_name="qa",
-        instruction_template="Answer yes or no.",
-        estimated_samples_per_doc=1.0,
-        min_content_length=30,
-    ))
+    DatasetTypeRegistry.register(
+        "yes_no",
+        DatasetType(
+            name="yes_no",
+            description="Yes/No question answering",
+            category="qa",
+            generator_name="qa",
+            instruction_template="Answer yes or no.",
+            estimated_samples_per_doc=1.0,
+            min_content_length=30,
+        ),
+    )
 
     # Conversation types
-    DatasetTypeRegistry.register("chat", DatasetType(
-        name="chat",
-        description="Single/multi-turn chat conversations",
-        category="conversation",
-        generator_name="conversation",
-        instruction_template="Continue the conversation naturally.",
-        estimated_samples_per_doc=2.0,
-        min_content_length=100,
-    ))
+    DatasetTypeRegistry.register(
+        "chat",
+        DatasetType(
+            name="chat",
+            description="Single/multi-turn chat conversations",
+            category="conversation",
+            generator_name="conversation",
+            instruction_template="Continue the conversation naturally.",
+            estimated_samples_per_doc=2.0,
+            min_content_length=100,
+        ),
+    )
 
-    DatasetTypeRegistry.register("dialogue", DatasetType(
-        name="dialogue",
-        description="Roleplay dialogue scenarios",
-        category="conversation",
-        generator_name="conversation",
-        instruction_template="Roleplay this dialogue scenario.",
-        estimated_samples_per_doc=2.0,
-        min_content_length=100,
-    ))
+    DatasetTypeRegistry.register(
+        "dialogue",
+        DatasetType(
+            name="dialogue",
+            description="Roleplay dialogue scenarios",
+            category="conversation",
+            generator_name="conversation",
+            instruction_template="Roleplay this dialogue scenario.",
+            estimated_samples_per_doc=2.0,
+            min_content_length=100,
+        ),
+    )
 
     # Instruction types
-    DatasetTypeRegistry.register("procedure", DatasetType(
-        name="procedure",
-        description="Step-by-step procedural instructions",
-        category="instruction",
-        generator_name="procedure",
-        instruction_template="Explain the steps to accomplish this task.",
-        estimated_samples_per_doc=1.5,
-        min_content_length=100,
-    ))
+    DatasetTypeRegistry.register(
+        "procedure",
+        DatasetType(
+            name="procedure",
+            description="Step-by-step procedural instructions",
+            category="instruction",
+            generator_name="procedure",
+            instruction_template="Explain the steps to accomplish this task.",
+            estimated_samples_per_doc=1.5,
+            min_content_length=100,
+        ),
+    )
 
-    DatasetTypeRegistry.register("howto", DatasetType(
-        name="howto",
-        description="How-to instructional content",
-        category="instruction",
-        generator_name="howto",
-        instruction_template="How do I accomplish this?",
-        estimated_samples_per_doc=2.0,
-        min_content_length=80,
-    ))
+    DatasetTypeRegistry.register(
+        "howto",
+        DatasetType(
+            name="howto",
+            description="How-to instructional content",
+            category="instruction",
+            generator_name="howto",
+            instruction_template="How do I accomplish this?",
+            estimated_samples_per_doc=2.0,
+            min_content_length=80,
+        ),
+    )
 
     # Classification types
-    DatasetTypeRegistry.register("topic_classify", DatasetType(
-        name="topic_classify",
-        description="Classify content into topics",
-        category="classification",
-        generator_name="classification",
-        instruction_template="Classify the topic of this content.",
-        estimated_samples_per_doc=1.0,
-        min_content_length=50,
-    ))
+    DatasetTypeRegistry.register(
+        "topic_classify",
+        DatasetType(
+            name="topic_classify",
+            description="Classify content into topics",
+            category="classification",
+            generator_name="classification",
+            instruction_template="Classify the topic of this content.",
+            estimated_samples_per_doc=1.0,
+            min_content_length=50,
+        ),
+    )
 
-    DatasetTypeRegistry.register("sentiment", DatasetType(
-        name="sentiment",
-        description="Determine sentiment of text",
-        category="classification",
-        generator_name="classification",
-        instruction_template="What is the sentiment of this text?",
-        estimated_samples_per_doc=1.0,
-        min_content_length=30,
-    ))
+    DatasetTypeRegistry.register(
+        "sentiment",
+        DatasetType(
+            name="sentiment",
+            description="Determine sentiment of text",
+            category="classification",
+            generator_name="classification",
+            instruction_template="What is the sentiment of this text?",
+            estimated_samples_per_doc=1.0,
+            min_content_length=30,
+        ),
+    )
 
-    DatasetTypeRegistry.register("entity_classify", DatasetType(
-        name="entity_classify",
-        description="Classify named entities",
-        category="classification",
-        generator_name="classification",
-        instruction_template="Identify and classify the entities in this text.",
-        estimated_samples_per_doc=2.0,
-        min_content_length=100,
-    ))
+    DatasetTypeRegistry.register(
+        "entity_classify",
+        DatasetType(
+            name="entity_classify",
+            description="Classify named entities",
+            category="classification",
+            generator_name="classification",
+            instruction_template="Identify and classify the entities in this text.",
+            estimated_samples_per_doc=2.0,
+            min_content_length=100,
+        ),
+    )
 
     # Summary types
-    DatasetTypeRegistry.register("executive_summary", DatasetType(
-        name="executive_summary",
-        description="Executive-level summary",
-        category="summary",
-        generator_name="summary",
-        instruction_template="Provide an executive summary.",
-        estimated_samples_per_doc=1.0,
-        min_content_length=300,
-    ))
+    DatasetTypeRegistry.register(
+        "executive_summary",
+        DatasetType(
+            name="executive_summary",
+            description="Executive-level summary",
+            category="summary",
+            generator_name="summary",
+            instruction_template="Provide an executive summary.",
+            estimated_samples_per_doc=1.0,
+            min_content_length=300,
+        ),
+    )
 
-    DatasetTypeRegistry.register("concise_summary", DatasetType(
-        name="concise_summary",
-        description="Concise brief summary",
-        category="summary",
-        generator_name="summary",
-        instruction_template="Summarize this concisely.",
-        estimated_samples_per_doc=1.0,
-        min_content_length=200,
-    ))
+    DatasetTypeRegistry.register(
+        "concise_summary",
+        DatasetType(
+            name="concise_summary",
+            description="Concise brief summary",
+            category="summary",
+            generator_name="summary",
+            instruction_template="Summarize this concisely.",
+            estimated_samples_per_doc=1.0,
+            min_content_length=200,
+        ),
+    )
 
     # Extraction types
-    DatasetTypeRegistry.register("key_value_extract", DatasetType(
-        name="key_value_extract",
-        description="Extract key-value pairs",
-        category="extraction",
-        generator_name="extraction",
-        instruction_template="Extract key-value pairs from this content.",
-        estimated_samples_per_doc=3.0,
-        min_content_length=50,
-    ))
+    DatasetTypeRegistry.register(
+        "key_value_extract",
+        DatasetType(
+            name="key_value_extract",
+            description="Extract key-value pairs",
+            category="extraction",
+            generator_name="extraction",
+            instruction_template="Extract key-value pairs from this content.",
+            estimated_samples_per_doc=3.0,
+            min_content_length=50,
+        ),
+    )
 
     # RAG types
-    DatasetTypeRegistry.register("citation_qa", DatasetType(
-        name="citation_qa",
-        description="QA with citation support",
-        category="rag",
-        generator_name="qa",
-        instruction_template="Answer with citations from the context.",
-        estimated_samples_per_doc=2.0,
-        min_content_length=300,
-    ))
+    DatasetTypeRegistry.register(
+        "citation_qa",
+        DatasetType(
+            name="citation_qa",
+            description="QA with citation support",
+            category="rag",
+            generator_name="qa",
+            instruction_template="Answer with citations from the context.",
+            estimated_samples_per_doc=2.0,
+            min_content_length=300,
+        ),
+    )
 
 
 # Register built-ins on module import

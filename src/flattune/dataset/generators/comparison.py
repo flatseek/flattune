@@ -39,27 +39,31 @@ class ComparisonGenerator(BaseGenerator):
         samples = []
 
         # Comparison prompt
-        samples.append({
-            "instruction": "Compare and contrast the items described in the following text.",
-            "input": content,
-            "output": "",  # Model learns to generate comparisons
-            "metadata": {
-                "source": document.get("_source", "unknown"),
-                "generator": "comparison",
-                "type": "comparison",
-            },
-        })
+        samples.append(
+            {
+                "instruction": "Compare and contrast the items described in the following text.",
+                "input": content,
+                "output": "",  # Model learns to generate comparisons
+                "metadata": {
+                    "source": document.get("_source", "unknown"),
+                    "generator": "comparison",
+                    "type": "comparison",
+                },
+            }
+        )
 
         # Similarity/difference analysis
-        samples.append({
-            "instruction": "Identify similarities and differences in the following text.",
-            "input": content,
-            "output": "",
-            "metadata": {
-                "source": document.get("_source", "unknown"),
-                "generator": "comparison",
-                "type": "similarity_analysis",
-            },
-        })
+        samples.append(
+            {
+                "instruction": "Identify similarities and differences in the following text.",
+                "input": content,
+                "output": "",
+                "metadata": {
+                    "source": document.get("_source", "unknown"),
+                    "generator": "comparison",
+                    "type": "similarity_analysis",
+                },
+            }
+        )
 
         return samples

@@ -52,8 +52,8 @@ class GlossaryGenerator(BaseGenerator):
             return []
 
         # Extract bold/italic terms (markdown formatting)
-        bold_terms = re.findall(r'\*\*([^*]+)\*\*', content)
-        italic_terms = re.findall(r'\*([^*]+)\*', content)
+        bold_terms = re.findall(r"\*\*([^*]+)\*\*", content)
+        italic_terms = re.findall(r"\*([^*]+)\*", content)
         all_terms = bold_terms + italic_terms
 
         for term in all_terms[:5]:  # Limit to 5 terms
@@ -63,23 +63,27 @@ class GlossaryGenerator(BaseGenerator):
 
             # Find context around term
             re.escape(term)
-            matches = list(re.finditer(rf'.{{0,30}}{re.escape(term)}.{{0,100}}', content, re.IGNORECASE))
+            matches = list(
+                re.finditer(rf".{{0,30}}{re.escape(term)}.{{0,100}}", content, re.IGNORECASE)
+            )
             for match in matches[:2]:
                 context = match.group(0).strip()
                 # Remove markdown formatting
-                context_clean = re.sub(r'\*+', '', context)
+                context_clean = re.sub(r"\*+", "", context)
 
-                samples.append({
-                    "instruction": base_instruction,
-                    "input": f"Term: {term}\nContext: {context_clean}",
-                    "output": context_clean,
-                    "metadata": {
-                        "source": document.get("_source", "unknown"),
-                        "generator": "glossary",
-                        "type": "glossary",
-                        "term": term,
-                    },
-                })
+                samples.append(
+                    {
+                        "instruction": base_instruction,
+                        "input": f"Term: {term}\nContext: {context_clean}",
+                        "output": context_clean,
+                        "metadata": {
+                            "source": document.get("_source", "unknown"),
+                            "generator": "glossary",
+                            "type": "glossary",
+                            "term": term,
+                        },
+                    }
+                )
 
         # Extract definition-like patterns
         definition_patterns = [
@@ -93,17 +97,19 @@ class GlossaryGenerator(BaseGenerator):
                 term = term.strip()
                 definition = definition.strip()
                 if len(term) > 2 and len(definition) > 5:
-                    samples.append({
-                        "instruction": base_instruction,
-                        "input": f"Term: {term}",
-                        "output": definition,
-                        "metadata": {
-                            "source": document.get("_source", "unknown"),
-                            "generator": "glossary",
-                            "type": "glossary",
-                            "term": term,
-                            "definition_type": def_type,
-                        },
-                    })
+                    samples.append(
+                        {
+                            "instruction": base_instruction,
+                            "input": f"Term: {term}",
+                            "output": definition,
+                            "metadata": {
+                                "source": document.get("_source", "unknown"),
+                                "generator": "glossary",
+                                "type": "glossary",
+                                "term": term,
+                                "definition_type": def_type,
+                            },
+                        }
+                    )
 
         return samples

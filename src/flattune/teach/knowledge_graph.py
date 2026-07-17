@@ -18,6 +18,7 @@ from typing import Any
 
 class NodeType(Enum):
     """Types of knowledge nodes."""
+
     DOCUMENT = "document"
     SECTION = "section"
     PARAGRAPH = "paragraph"
@@ -41,6 +42,7 @@ class NodeType(Enum):
 
 class EdgeType(Enum):
     """Types of relationships between nodes."""
+
     CONTAINS = "contains"
     REFERENCES = "references"
     IMPLEMENTS = "implements"
@@ -60,6 +62,7 @@ class KnowledgeNode:
 
     Represents a unit of knowledge that can be used to generate training samples.
     """
+
     id: str = field(default_factory=lambda: str(uuid.uuid4()))
     node_type: NodeType = NodeType.DOCUMENT
     content: str = ""
@@ -68,7 +71,9 @@ class KnowledgeNode:
     source_line: int | None = None
     metadata: dict[str, Any] = field(default_factory=dict)
     properties: dict[str, Any] = field(default_factory=dict)
-    edges: list[tuple[str, EdgeType, str]] = field(default_factory=list)  # (target_id, edge_type, label)
+    edges: list[tuple[str, EdgeType, str]] = field(
+        default_factory=list
+    )  # (target_id, edge_type, label)
     created_at: datetime = field(default_factory=datetime.now)
 
     def __str__(self) -> str:
@@ -129,9 +134,7 @@ class KnowledgeNode:
     @classmethod
     def from_dict(cls, data: dict) -> KnowledgeNode:
         """Create from dictionary representation."""
-        edges = [
-            (t, EdgeType(e), l) for t, e, l in data.get("edges", [])
-        ]
+        edges = [(t, EdgeType(e), l) for t, e, l in data.get("edges", [])]
         return cls(
             id=data["id"],
             node_type=NodeType(data["node_type"]),
@@ -152,6 +155,7 @@ class KnowledgeGraph:
     This is the intermediate representation used by the pipeline:
     Source → Parser → Knowledge Graph → Teacher → Generator → Dataset
     """
+
     nodes: dict[str, KnowledgeNode] = field(default_factory=dict)
     metadata: dict[str, Any] = field(default_factory=dict)
 
@@ -167,7 +171,9 @@ class KnowledgeGraph:
         self.nodes[node.id] = node
         return node
 
-    def add_edge(self, source_id: str, target_id: str, edge_type: EdgeType, label: str = "") -> None:
+    def add_edge(
+        self, source_id: str, target_id: str, edge_type: EdgeType, label: str = ""
+    ) -> None:
         """Add an edge between two nodes.
 
         Args:
@@ -464,9 +470,8 @@ class KnowledgeGraphBuilder:
         for table in tables:
             table_node = KnowledgeNode(
                 node_type=NodeType.DATABASE_TABLE,
-                content=f"Table: {table['name']}\n\n" + "\n".join(
-                    f"  {col['name']}: {col['type']}" for col in table.get("columns", [])
-                ),
+                content=f"Table: {table['name']}\n\n"
+                + "\n".join(f"  {col['name']}: {col['type']}" for col in table.get("columns", [])),
                 source=self._source,
                 metadata=table,
             )

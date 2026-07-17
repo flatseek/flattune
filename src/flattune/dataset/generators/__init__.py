@@ -73,16 +73,14 @@ def get_generator(name: str) -> BaseGenerator:
     # Only fall back to teach registry if not found in legacy
     try:
         from flattune.teach.registry import GeneratorRegistry
+
         cls = GeneratorRegistry.get(name)
         if cls is not None:
             return cls()
     except ImportError:
         pass
 
-    raise ValueError(
-        f"Unknown generator: {name}. "
-        f"Available: {list(_LEGACY_GENERATORS.keys())}"
-    )
+    raise ValueError(f"Unknown generator: {name}. Available: {list(_LEGACY_GENERATORS.keys())}")
 
 
 def list_generators() -> list[str]:
@@ -90,6 +88,7 @@ def list_generators() -> list[str]:
     # Combine new and legacy registries
     try:
         from flattune.teach.registry import GeneratorRegistry
+
         new_generators = set(GeneratorRegistry.list_plugins())
     except ImportError:
         new_generators = set()

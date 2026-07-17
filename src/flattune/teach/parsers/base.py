@@ -12,6 +12,7 @@ from flattune.teach.registry import BaseParser, SourceType
 @dataclass
 class ParseResult:
     """Result from a parser containing extracted knowledge."""
+
     source: str
     source_type: SourceType
     content: str

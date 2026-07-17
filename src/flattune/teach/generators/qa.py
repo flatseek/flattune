@@ -98,7 +98,10 @@ class QAGenerator(BaseGenerator):
             # Generate factual question
             yield GeneratedSample(
                 conversation=[
-                    {"role": "user", "content": f"What is described in this text: {sentence[:200]}?"},
+                    {
+                        "role": "user",
+                        "content": f"What is described in this text: {sentence[:200]}?",
+                    },
                     {"role": "assistant", "content": sentence},
                 ],
                 sample_type="qa",

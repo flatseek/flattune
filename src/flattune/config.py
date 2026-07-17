@@ -10,6 +10,7 @@ import yaml
 
 class FlatseekMode(Enum):
     """Flatseek integration mode."""
+
     AUTO = "auto"
     LIBRARY = "library"
     CLI = "cli"
@@ -17,6 +18,7 @@ class FlatseekMode(Enum):
 
 class FlatseekSource(Enum):
     """Flatseek data source type."""
+
     DIRECTORY = "directory"
     FSK = ".fsk"
     HTTP = "http"
@@ -24,6 +26,7 @@ class FlatseekSource(Enum):
 
 class ModelSource(Enum):
     """Model source type."""
+
     HUGGINGFACE = "huggingface"
     LOCAL = "local"
     GGUF = "gguf"
@@ -32,6 +35,7 @@ class ModelSource(Enum):
 
 class DatasetType(Enum):
     """Dataset generation type."""
+
     INSTRUCTION = "instruction"
     CHAT = "chat"
     QA = "qa"
@@ -43,6 +47,7 @@ class DatasetType(Enum):
 
 class TrainBackend(Enum):
     """Training backend."""
+
     UNSLOTH = "unsloth"
     TRANSFORMERS = "transformers"
     AXOLOTL = "axolotl"
@@ -51,6 +56,7 @@ class TrainBackend(Enum):
 
 class ExportFormat(Enum):
     """Export format."""
+
     GGUF = "gguf"
     MLX = "mlx"
     HF_MERGED = "hf-merged"
@@ -60,6 +66,7 @@ class ExportFormat(Enum):
 
 class QuantizationType(Enum):
     """Quantization types for GGUF export."""
+
     Q2_K = "q2_k"
     Q3_K = "q3_k"
     Q3_K_M = "q3_k_m"
@@ -75,6 +82,7 @@ class QuantizationType(Enum):
 
 class BenchmarkBackend(Enum):
     """Benchmark backend."""
+
     LMSTUDIO = "lmstudio"
     OLLAMA = "ollama"
     TRANSFORMERS = "transformers"
@@ -83,6 +91,7 @@ class BenchmarkBackend(Enum):
 @dataclass
 class FlatseekConfig:
     """Configuration for Flatseek integration."""
+
     mode: FlatseekMode = FlatseekMode.AUTO
     source: FlatseekSource = FlatseekSource.DIRECTORY
     path: str | None = None
@@ -102,6 +111,7 @@ class FlatseekConfig:
 @dataclass
 class ModelConfig:
     """Configuration for the model."""
+
     source: ModelSource = ModelSource.LOCAL
     repo: str | None = None
     path: str = "~/.lmstudio/models/prism-ml/Bonsai-1.7B-gguf/Bonsai-1.7B-Q1_0.gguf"
@@ -119,8 +129,9 @@ class ModelConfig:
 @dataclass
 class DatasetConfig:
     """Configuration for dataset generation."""
+
     type: DatasetType = DatasetType.INSTRUCTION
-    query: str = "*"           # Flatseek query to filter records
+    query: str = "*"  # Flatseek query to filter records
     tags: list[str] | None = None  # Filter by tags/categories (e.g., ["python", "rust"])
     field_mapping: dict[str, str] | None = None  # Map index fields to generator input
     train_split: float = 0.8
@@ -150,6 +161,7 @@ class DatasetConfig:
 @dataclass
 class TrainConfig:
     """Configuration for training."""
+
     backend: TrainBackend = TrainBackend.UNSLOTH
     epochs: int = 3
     lr: float = 2e-4
@@ -171,7 +183,9 @@ class TrainConfig:
 
     def to_dict(self) -> dict:
         return {
-            "backend": self.backend.value if isinstance(self.backend, TrainBackend) else self.backend,
+            "backend": self.backend.value
+            if isinstance(self.backend, TrainBackend)
+            else self.backend,
             "epochs": self.epochs,
             "lr": self.lr,
             "lora_rank": self.lora_rank,
@@ -194,6 +208,7 @@ class TrainConfig:
 @dataclass
 class ExportConfig:
     """Configuration for export."""
+
     format: ExportFormat = ExportFormat.GGUF
     quantization: str = "Q4_K_M"
     output_dir: str | None = None
@@ -209,6 +224,7 @@ class ExportConfig:
 @dataclass
 class BenchmarkConfig:
     """Configuration for benchmarking."""
+
     backend: BenchmarkBackend = BenchmarkBackend.LMSTUDIO
     prompt_file: str | None = None
     num_runs: int = 10
@@ -218,7 +234,9 @@ class BenchmarkConfig:
 
     def to_dict(self) -> dict:
         return {
-            "backend": self.backend.value if isinstance(self.backend, BenchmarkBackend) else self.backend,
+            "backend": self.backend.value
+            if isinstance(self.backend, BenchmarkBackend)
+            else self.backend,
             "prompt_file": self.prompt_file,
             "num_runs": self.num_runs,
             "max_tokens": self.max_tokens,
@@ -230,6 +248,7 @@ class BenchmarkConfig:
 @dataclass
 class FlatTuneConfig:
     """Main configuration for FlatTune."""
+
     name: str = "flattune-run"
     description: str | None = None
     flatseek: FlatseekConfig = field(default_factory=FlatseekConfig)

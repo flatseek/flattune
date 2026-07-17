@@ -99,10 +99,12 @@ class BenchmarkReporter:
             categories_data = benchmark_results.get("categories", {})
 
             # Summary table
-            lines.extend([
-                "| Metric | Value |",
-                "|--------|-------|",
-            ])
+            lines.extend(
+                [
+                    "| Metric | Value |",
+                    "|--------|-------|",
+                ]
+            )
 
             # Extract key metrics
             if "tokens_per_sec" in categories_data:
@@ -115,17 +117,21 @@ class BenchmarkReporter:
                 lat = lat_data.get("average_latency_seconds", 0)
                 lines.append(f"| Avg Latency | {lat:.3f}s |")
 
-            lines.extend([
-                f"| Backend | {backend} |",
-                f"| Categories Run | {', '.join(categories)} |",
-                "",
-            ])
+            lines.extend(
+                [
+                    f"| Backend | {backend} |",
+                    f"| Categories Run | {', '.join(categories)} |",
+                    "",
+                ]
+            )
 
             # Detailed category results
-            lines.extend([
-                "## Detailed Results",
-                "",
-            ])
+            lines.extend(
+                [
+                    "## Detailed Results",
+                    "",
+                ]
+            )
 
             for category in categories:
                 if category in categories_data:
@@ -133,26 +139,30 @@ class BenchmarkReporter:
 
         else:
             # Legacy structure
-            lines.extend([
-                "| Metric | Value |",
-                "|--------|-------|",
-                f"| Total Runs | {results.get('total_runs', 0)} |",
-                f"| Total Tokens | {results.get('total_tokens', 0)} |",
-                f"| Total Time | {results.get('total_time', 0):.2f}s |",
-                f"| Wall Time | {results.get('wall_time', 0):.2f}s |",
-                f"| Avg Tokens/sec | {results.get('average_tokens_per_second', 0):.2f} |",
-                "",
-            ])
+            lines.extend(
+                [
+                    "| Metric | Value |",
+                    "|--------|-------|",
+                    f"| Total Runs | {results.get('total_runs', 0)} |",
+                    f"| Total Tokens | {results.get('total_tokens', 0)} |",
+                    f"| Total Time | {results.get('total_time', 0):.2f}s |",
+                    f"| Wall Time | {results.get('wall_time', 0):.2f}s |",
+                    f"| Avg Tokens/sec | {results.get('average_tokens_per_second', 0):.2f} |",
+                    "",
+                ]
+            )
 
             # Individual results
             individual = results.get("individual_results", [])
             if individual:
-                lines.extend([
-                    "## Individual Results",
-                    "",
-                    "| Run | Prompt | Tokens | Time (s) | Tokens/sec |",
-                    "|-----|--------|--------|----------|-----------|",
-                ])
+                lines.extend(
+                    [
+                        "## Individual Results",
+                        "",
+                        "| Run | Prompt | Tokens | Time (s) | Tokens/sec |",
+                        "|-----|--------|--------|----------|-----------|",
+                    ]
+                )
 
                 for i, r in enumerate(individual[:50]):
                     lines.append(
@@ -165,16 +175,18 @@ class BenchmarkReporter:
                     lines.append(f"\n*... and {len(individual) - 50} more results*")
 
         # Add configuration section
-        lines.extend([
-            "",
-            "## Configuration",
-            "",
-            f"- Temperature: {results.get('temperature', 0)}",
-            f"- Max Tokens: {results.get('max_tokens', 0)}",
-            f"- Num Prompts: {results.get('num_prompts', 0)}",
-            f"- Num Runs per Prompt: {results.get('num_runs', 0)}",
-            "",
-        ])
+        lines.extend(
+            [
+                "",
+                "## Configuration",
+                "",
+                f"- Temperature: {results.get('temperature', 0)}",
+                f"- Max Tokens: {results.get('max_tokens', 0)}",
+                f"- Num Prompts: {results.get('num_prompts', 0)}",
+                f"- Num Runs per Prompt: {results.get('num_runs', 0)}",
+                "",
+            ]
+        )
 
         return "\n".join(lines)
 
@@ -194,26 +206,37 @@ class BenchmarkReporter:
         ]
 
         if category == "latency":
-            lines.extend([
-                f"- Average Latency: {data.get('average_latency_seconds', 0):.3f}s",
-                f"- Number of Runs: {len(data.get('results', []))}",
-            ])
+            lines.extend(
+                [
+                    f"- Average Latency: {data.get('average_latency_seconds', 0):.3f}s",
+                    f"- Number of Runs: {len(data.get('results', []))}",
+                ]
+            )
 
         elif category == "tokens_per_sec":
-            lines.extend([
-                f"- Average Tokens/sec: {data.get('average_tokens_per_second', 0):.2f}",
-                f"- Total Tokens: {data.get('total_tokens', 0)}",
-                f"- Total Time: {data.get('total_time', 0):.2f}s",
-            ])
+            lines.extend(
+                [
+                    f"- Average Tokens/sec: {data.get('average_tokens_per_second', 0):.2f}",
+                    f"- Total Tokens: {data.get('total_tokens', 0)}",
+                    f"- Total Time: {data.get('total_time', 0):.2f}s",
+                ]
+            )
 
-        elif category in ["prompt_quality", "instruction_following", "domain_accuracy",
-                          "hallucination_tests", "regression_tests"]:
+        elif category in [
+            "prompt_quality",
+            "instruction_following",
+            "domain_accuracy",
+            "hallucination_tests",
+            "regression_tests",
+        ]:
             num_prompts = data.get("num_prompts", 0)
             successful = data.get("successful_generations", 0)
-            lines.extend([
-                f"- Prompts: {num_prompts}",
-                f"- Successful Generations: {successful}",
-            ])
+            lines.extend(
+                [
+                    f"- Prompts: {num_prompts}",
+                    f"- Successful Generations: {successful}",
+                ]
+            )
 
             # Show sample results
             results_list = data.get("results", [])
@@ -223,8 +246,8 @@ class BenchmarkReporter:
                 for _i, r in enumerate(results_list[:3]):
                     prompt = r.get("prompt", "")[:50]
                     response = r.get("response", "")[:100]
-                    lines.append(f"- Prompt: \"{prompt}...\"")
-                    lines.append(f"  Response: \"{response}...\"")
+                    lines.append(f'- Prompt: "{prompt}..."')
+                    lines.append(f'  Response: "{response}..."')
 
         lines.append("")
         return lines
@@ -375,37 +398,47 @@ class BenchmarkReporter:
         after_lat = self._extract_latency(results_after)
         lat_improvement = ((before_lat - after_lat) / before_lat * 100) if before_lat > 0 else 0
 
-        lines.extend([
-            f"| Tokens/sec | {before_tps:.2f} | {after_tps:.2f} | {tps_improvement:+.1f}% |",
-            f"| Latency (s) | {before_lat:.3f} | {after_lat:.3f} | {lat_improvement:+.1f}% |",
-        ])
+        lines.extend(
+            [
+                f"| Tokens/sec | {before_tps:.2f} | {after_tps:.2f} | {tps_improvement:+.1f}% |",
+                f"| Latency (s) | {before_lat:.3f} | {after_lat:.3f} | {lat_improvement:+.1f}% |",
+            ]
+        )
 
         # Category-specific comparisons
         if "results" in results_before and "results" in results_after:
             before_cats = results_before.get("results", {}).get("categories", {})
             after_cats = results_after.get("results", {}).get("categories", {})
 
-            lines.extend([
-                "",
-                "## Category Comparisons",
-                "",
-            ])
+            lines.extend(
+                [
+                    "",
+                    "## Category Comparisons",
+                    "",
+                ]
+            )
 
             for category in before_cats.keys():
                 if category in after_cats:
                     lines.extend(
-                        self._format_category_comparison(category, before_cats[category], after_cats[category])
+                        self._format_category_comparison(
+                            category, before_cats[category], after_cats[category]
+                        )
                     )
 
         # Interpretation
-        lines.extend([
-            "",
-            "## Interpretation",
-            "",
-        ])
+        lines.extend(
+            [
+                "",
+                "## Interpretation",
+                "",
+            ]
+        )
 
         if tps_improvement > 5 and lat_improvement > 0:
-            lines.append("The fine-tuned model shows **improved** performance in both speed and latency.")
+            lines.append(
+                "The fine-tuned model shows **improved** performance in both speed and latency."
+            )
         elif tps_improvement > 5:
             lines.append("The fine-tuned model shows **improved** throughput but latency may vary.")
         elif tps_improvement < -5:
@@ -413,11 +446,13 @@ class BenchmarkReporter:
         else:
             lines.append("Performance is **similar** between base and fine-tuned models.")
 
-        lines.extend([
-            "",
-            "*Note: Quality of outputs should be evaluated separately from speed metrics.*",
-            "",
-        ])
+        lines.extend(
+            [
+                "",
+                "*Note: Quality of outputs should be evaluated separately from speed metrics.*",
+                "",
+            ]
+        )
 
         return "\n".join(lines)
 
@@ -523,8 +558,12 @@ class BenchmarkReporter:
                 "latency_seconds": after_lat,
             },
             "change": {
-                "tokens_per_second_percent": ((after_tps - before_tps) / before_tps * 100) if before_tps > 0 else 0,
-                "latency_percent": ((before_lat - after_lat) / before_lat * 100) if before_lat > 0 else 0,
+                "tokens_per_second_percent": ((after_tps - before_tps) / before_tps * 100)
+                if before_tps > 0
+                else 0,
+                "latency_percent": ((before_lat - after_lat) / before_lat * 100)
+                if before_lat > 0
+                else 0,
             },
         }
 
@@ -565,7 +604,7 @@ class BenchmarkReporter:
             lat = self._extract_latency(results)
             status = results.get("status", "unknown")
 
-            lines.append(f"| {i+1} | {backend} | {tps:.2f} | {lat:.3f}s | {status} |")
+            lines.append(f"| {i + 1} | {backend} | {tps:.2f} | {lat:.3f}s | {status} |")
 
         report_path.write_text("\n".join(lines))
         logger.info(f"Summary table saved to: {report_path}")

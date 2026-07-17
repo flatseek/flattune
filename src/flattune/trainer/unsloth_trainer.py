@@ -84,6 +84,7 @@ class UnslothTrainer(TrainerBase):
 
         try:
             import torch
+
             torch.manual_seed(seed)
             if torch.cuda.is_available():
                 torch.cuda.manual_seed_all(seed)
@@ -265,9 +266,7 @@ class UnslothTrainer(TrainerBase):
         lora_rank = getattr(self.config, "lora_rank", 16)
         lora_alpha = getattr(self.config, "lora_alpha", 32)
         lora_dropout = getattr(self.config, "lora_dropout", 0.05)
-        lora_target_modules = getattr(
-            self.config, "lora_target_modules", ["q_proj", "v_proj"]
-        )
+        lora_target_modules = getattr(self.config, "lora_target_modules", ["q_proj", "v_proj"])
 
         model = FastLanguageModel.get_peft_model(
             model,
@@ -391,6 +390,7 @@ class UnslothTrainer(TrainerBase):
         # Use SFTTrainer from trl for supervised fine-tuning
         try:
             from trl import SFTTrainer
+
             trainer = SFTTrainer(
                 model=model,
                 tokenizer=tokenizer,
@@ -402,6 +402,7 @@ class UnslothTrainer(TrainerBase):
         except ImportError:
             # Fallback to standard Trainer
             from transformers import Trainer
+
             trainer = Trainer(
                 model=model,
                 tokenizer=tokenizer,
@@ -467,7 +468,8 @@ class UnslothTrainer(TrainerBase):
         # Eval loss if available
         if metrics["eval_loss"]:
             eval_steps = [
-                metrics["steps"][i] for i in range(len(metrics["steps"]))
+                metrics["steps"][i]
+                for i in range(len(metrics["steps"]))
                 if i < len(metrics["eval_loss"])
             ]
             if not eval_steps:
@@ -523,11 +525,8 @@ class UnslothTrainer(TrainerBase):
             "learning_rate": self.config.lr,
             "lora_rank": getattr(self.config, "lora_rank", 16),
             "lora_alpha": getattr(self.config, "lora_alpha", 32),
-            "checkpoints": [
-                str(p) for p in self.checkpoint_dir.glob("**/*.pt")
-            ] + [
-                str(p) for p in self.checkpoint_dir.glob("**/*.safetensors")
-            ],
+            "checkpoints": [str(p) for p in self.checkpoint_dir.glob("**/*.pt")]
+            + [str(p) for p in self.checkpoint_dir.glob("**/*.safetensors")],
             "metrics": {
                 "train_loss": metrics["train_loss"],
                 "eval_loss": metrics["eval_loss"],
@@ -574,9 +573,7 @@ class UnslothTrainer(TrainerBase):
             try:
                 from unsloth import FastLanguageModel
             except ImportError:
-                raise ImportError(
-                    "Unsloth is not installed. Install it with: pip install unsloth"
-                )
+                raise ImportError("Unsloth is not installed. Install it with: pip install unsloth")
 
             # Load model based on source
             model_source = self._detect_model_source()
@@ -591,9 +588,7 @@ class UnslothTrainer(TrainerBase):
             dataset = self._prepare_dataset()
 
             # Create trainer
-            self._trainer = self._create_trainer(
-                self._model, self._tokenizer, dataset
-            )
+            self._trainer = self._create_trainer(self._model, self._tokenizer, dataset)
 
             # Train
             logger.info("Starting training loop...")
@@ -646,9 +641,7 @@ class UnslothTrainer(TrainerBase):
         logger.info("Merging LoRA adapter with base model...")
 
         if self._model is None:
-            raise RuntimeError(
-                "Model not loaded. Please run train() first or load a model."
-            )
+            raise RuntimeError("Model not loaded. Please run train() first or load a model.")
 
         merged_path = self.output_dir / "merged"
         merged_path.mkdir(parents=True, exist_ok=True)
@@ -717,9 +710,7 @@ class UnslothTrainer(TrainerBase):
                 # MLX export would go here
                 logger.warning("MLX export is not yet fully implemented.")
             except ImportError:
-                raise ImportError(
-                    "MLX not installed. Install with: pip install mlx"
-                )
+                raise ImportError("MLX not installed. Install with: pip install mlx")
 
         elif format.lower() in ("hf", "huggingface", "hf_merged"):
             # Export to HuggingFace format
@@ -759,9 +750,7 @@ class UnslothTrainer(TrainerBase):
         logger.info("Evaluating model...")
 
         if self._trainer is None:
-            raise RuntimeError(
-                "Trainer not initialized. Please run train() first."
-            )
+            raise RuntimeError("Trainer not initialized. Please run train() first.")
 
         # Run evaluation
         eval_result = self._trainer.evaluate()

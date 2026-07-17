@@ -81,6 +81,7 @@ def set_seed(seed: int) -> None:
     # Try PyTorch
     try:
         import torch
+
         torch.manual_seed(seed)
         if torch.cuda.is_available():
             torch.cuda.manual_seed_all(seed)
@@ -139,6 +140,7 @@ class ReproducibilityContext:
         # Save original seeds
         try:
             import torch
+
             self._original_seeds["torch"] = torch.initial_seed()
         except ImportError:
             pass

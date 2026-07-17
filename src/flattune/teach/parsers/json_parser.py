@@ -98,10 +98,12 @@ class JSONParser(BaseParser):
             entities = []
             for key, value in record.items():
                 if isinstance(value, str) and len(value) < 100:
-                    entities.append({
-                        "type": key,
-                        "content": value,
-                    })
+                    entities.append(
+                        {
+                            "type": key,
+                            "content": value,
+                        }
+                    )
 
             return ParseResult(
                 source=source,
@@ -145,7 +147,9 @@ class JSONLParser(BaseParser):
                         try:
                             data = json.loads(line)
                             metadata = {"line": i + 1}
-                            content = json.dumps(data, indent=2) if isinstance(data, dict) else str(data)
+                            content = (
+                                json.dumps(data, indent=2) if isinstance(data, dict) else str(data)
+                            )
 
                             yield ParseResult(
                                 source=source_str,

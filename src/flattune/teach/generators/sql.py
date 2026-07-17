@@ -74,10 +74,12 @@ class SQLGenerator(BaseGenerator):
         matches = re.findall(create_pattern, text, re.IGNORECASE)
 
         for table_name in matches:
-            tables.append({
-                "name": table_name,
-                "columns": [],
-            })
+            tables.append(
+                {
+                    "name": table_name,
+                    "columns": [],
+                }
+            )
 
         return tables
 
@@ -126,8 +128,14 @@ class SQLGenerator(BaseGenerator):
                 # Generic column names
                 yield GeneratedSample(
                     conversation=[
-                        {"role": "user", "content": f"Find all {table_name} with id greater than 10"},
-                        {"role": "assistant", "content": f"SELECT * FROM {table_name} WHERE id > 10;"},
+                        {
+                            "role": "user",
+                            "content": f"Find all {table_name} with id greater than 10",
+                        },
+                        {
+                            "role": "assistant",
+                            "content": f"SELECT * FROM {table_name} WHERE id > 10;",
+                        },
                     ],
                     sample_type="nl_to_sql",
                     source=source,
@@ -154,7 +162,11 @@ class SQLGenerator(BaseGenerator):
                         sample_type="nl_to_sql",
                         source=source,
                         quality_score=0.7,
-                        metadata={"table": table_name, "column": col_name, "query_type": "where_not_null"},
+                        metadata={
+                            "table": table_name,
+                            "column": col_name,
+                            "query_type": "where_not_null",
+                        },
                     )
 
     def _generate_aggregation_queries(
@@ -180,7 +192,10 @@ class SQLGenerator(BaseGenerator):
             yield GeneratedSample(
                 conversation=[
                     {"role": "user", "content": f"Show me {table_name} grouped by type"},
-                    {"role": "assistant", "content": f"SELECT type, COUNT(*) FROM {table_name} GROUP BY type;"},
+                    {
+                        "role": "assistant",
+                        "content": f"SELECT type, COUNT(*) FROM {table_name} GROUP BY type;",
+                    },
                 ],
                 sample_type="nl_to_sql",
                 source=source,

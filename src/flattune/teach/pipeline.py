@@ -33,6 +33,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class PipelineConfig:
     """Configuration for the teach pipeline."""
+
     # Parser settings
     parser: str = "auto"  # "auto" or specific parser name
     source_type: SourceType | None = None
@@ -68,6 +69,7 @@ class PipelineConfig:
 @dataclass
 class PipelineStats:
     """Statistics from pipeline execution."""
+
     start_time: datetime = field(default_factory=datetime.now)
     end_time: datetime | None = None
     sources_processed: int = 0
@@ -82,8 +84,7 @@ class PipelineStats:
             "start_time": self.start_time.isoformat(),
             "end_time": self.end_time.isoformat() if self.end_time else None,
             "duration_seconds": (
-                (self.end_time - self.start_time).total_seconds()
-                if self.end_time else None
+                (self.end_time - self.start_time).total_seconds() if self.end_time else None
             ),
             "sources_processed": self.sources_processed,
             "nodes_created": self.nodes_created,
@@ -166,7 +167,9 @@ class TeachPipeline:
                 max_tokens=self.config.teacher_max_tokens,
             )
         except Exception as e:
-            logger.warning(f"Failed to create teacher '{teacher_config}': {e}. Using template-based generation.")
+            logger.warning(
+                f"Failed to create teacher '{teacher_config}': {e}. Using template-based generation."
+            )
             teacher = None
 
         return teacher
@@ -391,12 +394,14 @@ class TeachPipeline:
 
         try:
             import json as _json
+
             content = path.read_text(encoding="utf-8")
             if path.suffix == ".json":
                 spec = _json.loads(content)
             else:
                 try:
                     import yaml
+
                     spec = yaml.safe_load(content)
                 except Exception:
                     return ""
@@ -447,7 +452,15 @@ class TeachPipeline:
             lines.append(f"\n=== {resource.upper()} ===")
             for path_str, path_item in endpoints:
                 for method, operation in sorted(path_item.items()):
-                    if method.upper() not in ("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"):
+                    if method.upper() not in (
+                        "GET",
+                        "POST",
+                        "PUT",
+                        "DELETE",
+                        "PATCH",
+                        "OPTIONS",
+                        "HEAD",
+                    ):
                         continue
                     if not isinstance(operation, dict):
                         continue
@@ -462,7 +475,11 @@ class TeachPipeline:
                     for p in operation.get("parameters", []):
                         pname = p.get("name", "")
                         pin = p.get("in", "query")
-                        ptype = p.get("schema", {}).get("type", "string") if p.get("schema") else "string"
+                        ptype = (
+                            p.get("schema", {}).get("type", "string")
+                            if p.get("schema")
+                            else "string"
+                        )
                         preq = "required" if p.get("required") else "optional"
                         pdesc = p.get("description", "")
                         if pdesc:
@@ -484,7 +501,9 @@ class TeachPipeline:
                                     preq = "required" if prop_name in required else "optional"
                                     pdesc = prop.get("description", "")
                                     if pdesc:
-                                        lines.append(f"    body: {prop_name} ({ptype}, {preq}) — {pdesc}")
+                                        lines.append(
+                                            f"    body: {prop_name} ({ptype}, {preq}) — {pdesc}"
+                                        )
                                     else:
                                         lines.append(f"    body: {prop_name} ({ptype}, {preq})")
                             elif schema.get("$ref"):

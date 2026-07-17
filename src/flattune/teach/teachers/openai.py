@@ -49,6 +49,7 @@ class OpenAITeacher(BaseTeacher):
         if self._client is None:
             try:
                 from openai import OpenAI
+
                 self._client = OpenAI(
                     api_key=self.api_key,
                     base_url=self.base_url,
@@ -149,21 +150,18 @@ Generate a question that tests understanding of this knowledge, followed by a co
 Format your response as:
 Question: <your question>
 Answer: <your answer>""",
-
             "summarization": f"""Summarize the following knowledge concisely.
 
 Knowledge:
 {knowledge}
 
 Provide a clear, concise summary that captures the key points.""",
-
             "extraction": f"""Extract key information from the following knowledge.
 
 Knowledge:
 {knowledge}
 
 List the most important facts, entities, and relationships.""",
-
             "tool_call": f"""Based on the following API/tool documentation, generate example conversations
 showing how a user would request actions and how the tool should be called.
 
@@ -171,7 +169,6 @@ API Documentation:
 {knowledge}
 
 Generate 2-3 diverse examples of user requests and appropriate tool calls.""",
-
             "intent": f"""Based on the following tool/API, generate diverse ways users might express
 the same intent.
 
@@ -179,7 +176,6 @@ Tool:
 {knowledge}
 
 Generate 5 different ways users might request this (formal, casual, with typos, etc).""",
-
             "nl_to_sql": f"""Based on the following database schema, generate natural language
 to SQL query pairs.
 
@@ -191,7 +187,7 @@ Generate 2-3 examples of user questions and corresponding SQL queries.""",
 
         return base_prompts.get(
             sample_type,
-            f"Based on the following knowledge, generate a {sample_type} sample.\n\nKnowledge:\n{knowledge}\n\nGenerate the sample."
+            f"Based on the following knowledge, generate a {sample_type} sample.\n\nKnowledge:\n{knowledge}\n\nGenerate the sample.",
         )
 
     def _parse_response(

@@ -51,15 +51,17 @@ class ConceptGenerator(BaseGenerator):
             return []
 
         # Generate concept explanation sample
-        samples.append({
-            "instruction": base_instruction,
-            "input": f"Concept: {title or content[:100]}\n\nContext: {content[:800]}",
-            "output": content[:400] if len(content) > 400 else content,
-            "metadata": {
-                "source": document.get("_source", "unknown"),
-                "generator": "concept",
-                "type": "concept",
-            },
-        })
+        samples.append(
+            {
+                "instruction": base_instruction,
+                "input": f"Concept: {title or content[:100]}\n\nContext: {content[:800]}",
+                "output": content[:400] if len(content) > 400 else content,
+                "metadata": {
+                    "source": document.get("_source", "unknown"),
+                    "generator": "concept",
+                    "type": "concept",
+                },
+            }
+        )
 
         return samples

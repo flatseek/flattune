@@ -27,7 +27,9 @@ class SummaryGenerator(BaseGenerator):
             List containing one summarization sample if valid content exists.
         """
         # Extract content from document
-        content = self._extract_field(document, ["text", "content", "body", "description", "abstract"])
+        content = self._extract_field(
+            document, ["text", "content", "body", "description", "abstract"]
+        )
         if not content:
             return []
 
@@ -37,34 +39,38 @@ class SummaryGenerator(BaseGenerator):
 
         # Filter by max length
         if len(content) > config.max_length:
-            content = content[:config.max_length]
+            content = content[: config.max_length]
 
         samples = []
 
         # Create summarization prompt
-        samples.append({
-            "instruction": "Summarize the following text concisely.",
-            "input": content,
-            "output": "",  # Model learns to generate summaries
-            "metadata": {
-                "source": document.get("_source", "unknown"),
-                "generator": "summary",
-                "type": "summary",
-                "original_length": len(content),
-            },
-        })
+        samples.append(
+            {
+                "instruction": "Summarize the following text concisely.",
+                "input": content,
+                "output": "",  # Model learns to generate summaries
+                "metadata": {
+                    "source": document.get("_source", "unknown"),
+                    "generator": "summary",
+                    "type": "summary",
+                    "original_length": len(content),
+                },
+            }
+        )
 
         # Also add a key-points extraction variant
-        samples.append({
-            "instruction": "Extract the key points from the following text.",
-            "input": content,
-            "output": "",  # Model learns to extract key points
-            "metadata": {
-                "source": document.get("_source", "unknown"),
-                "generator": "summary",
-                "type": "key_points",
-                "original_length": len(content),
-            },
-        })
+        samples.append(
+            {
+                "instruction": "Extract the key points from the following text.",
+                "input": content,
+                "output": "",  # Model learns to extract key points
+                "metadata": {
+                    "source": document.get("_source", "unknown"),
+                    "generator": "summary",
+                    "type": "key_points",
+                    "original_length": len(content),
+                },
+            }
+        )
 
         return samples

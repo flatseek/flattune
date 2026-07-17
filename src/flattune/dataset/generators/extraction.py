@@ -39,39 +39,45 @@ class ExtractionGenerator(BaseGenerator):
         samples = []
 
         # Named entity extraction
-        samples.append({
-            "instruction": "Extract all named entities (people, places, organizations) from the following text.",
-            "input": content,
-            "output": "",  # Model learns entity extraction
-            "metadata": {
-                "source": document.get("_source", "unknown"),
-                "generator": "extraction",
-                "type": "ner",
-            },
-        })
+        samples.append(
+            {
+                "instruction": "Extract all named entities (people, places, organizations) from the following text.",
+                "input": content,
+                "output": "",  # Model learns entity extraction
+                "metadata": {
+                    "source": document.get("_source", "unknown"),
+                    "generator": "extraction",
+                    "type": "ner",
+                },
+            }
+        )
 
         # Key facts extraction
-        samples.append({
-            "instruction": "Extract key facts and information from the following text.",
-            "input": content,
-            "output": "",
-            "metadata": {
-                "source": document.get("_source", "unknown"),
-                "generator": "extraction",
-                "type": "fact_extraction",
-            },
-        })
+        samples.append(
+            {
+                "instruction": "Extract key facts and information from the following text.",
+                "input": content,
+                "output": "",
+                "metadata": {
+                    "source": document.get("_source", "unknown"),
+                    "generator": "extraction",
+                    "type": "fact_extraction",
+                },
+            }
+        )
 
         # Structured data extraction
-        samples.append({
-            "instruction": "Extract structured information as key-value pairs from the following text.",
-            "input": content,
-            "output": "",
-            "metadata": {
-                "source": document.get("_source", "unknown"),
-                "generator": "extraction",
-                "type": "structured_extraction",
-            },
-        })
+        samples.append(
+            {
+                "instruction": "Extract structured information as key-value pairs from the following text.",
+                "input": content,
+                "output": "",
+                "metadata": {
+                    "source": document.get("_source", "unknown"),
+                    "generator": "extraction",
+                    "type": "structured_extraction",
+                },
+            }
+        )
 
         return samples

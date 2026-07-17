@@ -51,15 +51,10 @@ def get_run_folder(config: FlatTuneConfig) -> Path:
         raise FileNotFoundError(f"Output directory not found: {output_dir}")
 
     # Find run directories matching the config name
-    run_dirs = [
-        d for d in output_dir.iterdir()
-        if d.is_dir() and d.name.startswith(config.name)
-    ]
+    run_dirs = [d for d in output_dir.iterdir() if d.is_dir() and d.name.startswith(config.name)]
 
     if not run_dirs:
-        raise FileNotFoundError(
-            f"No run directories found for {config.name} in {output_dir}"
-        )
+        raise FileNotFoundError(f"No run directories found for {config.name} in {output_dir}")
 
     # Return most recently modified
     return max(run_dirs, key=lambda d: d.stat().st_mtime)

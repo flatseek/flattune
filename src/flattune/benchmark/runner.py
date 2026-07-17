@@ -58,6 +58,7 @@ class BenchmarkRunner:
         """
         try:
             from transformers import pipeline
+
             return TransformersClient(
                 model_name=self.config.model_name,
                 max_tokens=self.config.max_tokens,
@@ -254,9 +255,15 @@ class BenchmarkRunner:
         after_data = results_after.get("results", {})
 
         # Compare each category
-        for category in ["latency", "tokens_per_sec", "prompt_quality",
-                         "instruction_following", "domain_accuracy",
-                         "hallucination_tests", "regression_tests"]:
+        for category in [
+            "latency",
+            "tokens_per_sec",
+            "prompt_quality",
+            "instruction_following",
+            "domain_accuracy",
+            "hallucination_tests",
+            "regression_tests",
+        ]:
             before_cat = before_data.get("categories", {}).get(category, {})
             after_cat = after_data.get("categories", {}).get(category, {})
 
@@ -343,11 +350,11 @@ class BenchmarkRunner:
             "prompt": prompt,
             "generation": result.get("text", ""),
             "elapsed": result.get("elapsed", 0),
-            "tokens": result.get("usage", {}).get("total_tokens", 0)
-                or result.get("eval_count", 0),
+            "tokens": result.get("usage", {}).get("total_tokens", 0) or result.get("eval_count", 0),
             "tokens_per_second": (
                 result.get("usage", {}).get("total_tokens", 0) / result.get("elapsed", 1)
-                if result.get("elapsed", 0) > 0 else 0
+                if result.get("elapsed", 0) > 0
+                else 0
             ),
         }
 
@@ -457,6 +464,7 @@ class TransformersClient:
         """
         if self._pipeline is None:
             from transformers import pipeline
+
             self._pipeline = pipeline(
                 "text-generation",
                 model=self.model_name,
@@ -477,7 +485,9 @@ class TransformersClient:
         except Exception:
             return False
 
-    def generate(self, prompt: str, max_tokens: int = 512, temperature: float = 0.7) -> dict[str, Any]:
+    def generate(
+        self, prompt: str, max_tokens: int = 512, temperature: float = 0.7
+    ) -> dict[str, Any]:
         """Generate text using Transformers.
 
         Args:
@@ -489,6 +499,7 @@ class TransformersClient:
             Dictionary containing generated text and metrics.
         """
         import time
+
         start_time = time.time()
 
         try:
@@ -551,13 +562,15 @@ class TransformersClient:
                     elapsed = result.get("elapsed", 0)
                     total_tokens += tokens
                     total_time += elapsed
-                    results.append({
-                        "prompt_index": i,
-                        "run": run,
-                        "tokens": tokens,
-                        "elapsed": elapsed,
-                        "tokens_per_second": result.get("tokens_per_second", 0),
-                    })
+                    results.append(
+                        {
+                            "prompt_index": i,
+                            "run": run,
+                            "tokens": tokens,
+                            "elapsed": elapsed,
+                            "tokens_per_second": result.get("tokens_per_second", 0),
+                        }
+                    )
 
         avg_tokens_per_second = total_tokens / total_time if total_time > 0 else 0
 

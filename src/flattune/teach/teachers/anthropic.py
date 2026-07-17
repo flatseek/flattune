@@ -45,6 +45,7 @@ class AnthropicTeacher(BaseTeacher):
         if self._client is None:
             try:
                 from anthropic import Anthropic
+
                 self._client = Anthropic(api_key=self.api_key)
             except ImportError:
                 logger.error("Anthropic package not installed. Install with: pip install anthropic")
@@ -121,14 +122,12 @@ Generate a question that tests understanding of this knowledge, followed by a co
 Format your response as:
 Question: <your question>
 Answer: <your answer>""",
-
             "summarization": f"""Summarize the following knowledge concisely.
 
 Knowledge:
 {knowledge}
 
 Provide a clear, concise summary that captures the key points.""",
-
             "tool_call": f"""Based on the following API/tool documentation, generate example conversations
 showing how a user would request actions and how the tool should be called.
 
@@ -136,7 +135,6 @@ API Documentation:
 {knowledge}
 
 Generate 2-3 diverse examples of user requests and appropriate tool calls.""",
-
             "nl_to_sql": f"""Based on the following database schema, generate natural language
 to SQL query pairs.
 
@@ -148,7 +146,7 @@ Generate 2-3 examples of user questions and corresponding SQL queries.""",
 
         return base_prompts.get(
             sample_type,
-            f"Based on the following knowledge, generate a {sample_type} sample.\n\nKnowledge:\n{knowledge}"
+            f"Based on the following knowledge, generate a {sample_type} sample.\n\nKnowledge:\n{knowledge}",
         )
 
     def _parse_response(

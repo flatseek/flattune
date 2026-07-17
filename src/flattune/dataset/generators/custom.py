@@ -51,41 +51,45 @@ class CustomGenerator(BaseGenerator):
 
         # Truncate if needed
         if len(content) > config.max_length:
-            content = content[:config.max_length]
+            content = content[: config.max_length]
 
         # Generic instruction based on field name
         instruction = self._generate_instruction(field_name, document)
 
-        samples.append({
-            "instruction": instruction,
-            "input": content,
-            "output": "",
-            "metadata": {
-                "source": document.get("_source", "unknown"),
-                "generator": "custom",
-                "field": field_name,
-                "type": "custom",
-            },
-        })
+        samples.append(
+            {
+                "instruction": instruction,
+                "input": content,
+                "output": "",
+                "metadata": {
+                    "source": document.get("_source", "unknown"),
+                    "generator": "custom",
+                    "field": field_name,
+                    "type": "custom",
+                },
+            }
+        )
 
         # Also create a sample using second longest field if available
         if len(text_fields) > 1:
             field_name2, content2 = text_fields[1]
             if len(content2) > config.min_length:
                 if len(content2) > config.max_length:
-                    content2 = content2[:config.max_length]
+                    content2 = content2[: config.max_length]
 
-                samples.append({
-                    "instruction": f"Process the following {field_name2}.",
-                    "input": content2,
-                    "output": "",
-                    "metadata": {
-                        "source": document.get("_source", "unknown"),
-                        "generator": "custom",
-                        "field": field_name2,
-                        "type": "custom",
-                    },
-                })
+                samples.append(
+                    {
+                        "instruction": f"Process the following {field_name2}.",
+                        "input": content2,
+                        "output": "",
+                        "metadata": {
+                            "source": document.get("_source", "unknown"),
+                            "generator": "custom",
+                            "field": field_name2,
+                            "type": "custom",
+                        },
+                    }
+                )
 
         return samples
 

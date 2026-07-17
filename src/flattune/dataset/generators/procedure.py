@@ -55,55 +55,61 @@ class ProcedureGenerator(BaseGenerator):
 
         # Extract numbered steps
         numbered_steps = re.findall(
-            r'(?:\d+\.?\s+(?:step\s+)?(?:(?:\d+|[a-z])\.?\s+)?)([^\n]+)',
-            content,
-            re.IGNORECASE
+            r"(?:\d+\.?\s+(?:step\s+)?(?:(?:\d+|[a-z])\.?\s+)?)([^\n]+)", content, re.IGNORECASE
         )
 
         # Extract bullet points
-        bullet_points = re.findall(r'^\s*[-*+]\s+([^\n]+)', content, re.MULTILINE)
+        bullet_points = re.findall(r"^\s*[-*+]\s+([^\n]+)", content, re.MULTILINE)
 
         # Combine steps
         all_steps = numbered_steps + bullet_points
 
         if all_steps:
             # Create procedure sample
-            steps_text = "\n".join(f"{i+1}. {step.strip()}" for i, step in enumerate(all_steps[:10]))
+            steps_text = "\n".join(
+                f"{i + 1}. {step.strip()}" for i, step in enumerate(all_steps[:10])
+            )
 
-            samples.append({
-                "instruction": base_instruction,
-                "input": f"Task: {title or content[:100]}\n\n{steps_text}",
-                "output": content[:300] if len(content) > 300 else content,
-                "metadata": {
-                    "source": document.get("_source", "unknown"),
-                    "generator": "procedure",
-                    "type": "procedure",
-                    "step_count": len(all_steps[:10]),
-                },
-            })
+            samples.append(
+                {
+                    "instruction": base_instruction,
+                    "input": f"Task: {title or content[:100]}\n\n{steps_text}",
+                    "output": content[:300] if len(content) > 300 else content,
+                    "metadata": {
+                        "source": document.get("_source", "unknown"),
+                        "generator": "procedure",
+                        "type": "procedure",
+                        "step_count": len(all_steps[:10]),
+                    },
+                }
+            )
 
             # How-to sample
-            samples.append({
-                "instruction": "How do I accomplish this task?",
-                "input": f"Task: {title or content[:100]}",
-                "output": steps_text if all_steps else content[:200],
-                "metadata": {
-                    "source": document.get("_source", "unknown"),
-                    "generator": "procedure",
-                    "type": "howto",
-                },
-            })
+            samples.append(
+                {
+                    "instruction": "How do I accomplish this task?",
+                    "input": f"Task: {title or content[:100]}",
+                    "output": steps_text if all_steps else content[:200],
+                    "metadata": {
+                        "source": document.get("_source", "unknown"),
+                        "generator": "procedure",
+                        "type": "howto",
+                    },
+                }
+            )
         else:
             # No clear steps, create general instruction sample
-            samples.append({
-                "instruction": base_instruction,
-                "input": f"Task: {title or content[:100]}",
-                "output": content[:300] if len(content) > 300 else content,
-                "metadata": {
-                    "source": document.get("_source", "unknown"),
-                    "generator": "procedure",
-                    "type": "procedure",
-                },
-            })
+            samples.append(
+                {
+                    "instruction": base_instruction,
+                    "input": f"Task: {title or content[:100]}",
+                    "output": content[:300] if len(content) > 300 else content,
+                    "metadata": {
+                        "source": document.get("_source", "unknown"),
+                        "generator": "procedure",
+                        "type": "procedure",
+                    },
+                }
+            )
 
         return samples

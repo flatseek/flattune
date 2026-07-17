@@ -83,7 +83,9 @@ class SourceDetector:
                     # Heuristics for text content
                     if content:
                         # Contains mostly printable characters
-                        printable_ratio = sum(c.isprintable() or c in '\n\r\t' for c in content) / len(content)
+                        printable_ratio = sum(
+                            c.isprintable() or c in "\n\r\t" for c in content
+                        ) / len(content)
                         if printable_ratio > 0.9:
                             return SourceDetectionResult(
                                 source_type=SourceType.TEXT,

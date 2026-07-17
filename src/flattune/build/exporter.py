@@ -84,7 +84,9 @@ class BuildExporter:
                     sample["metadata"] = {}
                 f.write(json.dumps(sample, ensure_ascii=False) + "\n")
 
-    def _generate_metadata(self, plan: BuildPlan, samples_by_type: dict[str, list[dict]]) -> dict[str, Any]:
+    def _generate_metadata(
+        self, plan: BuildPlan, samples_by_type: dict[str, list[dict]]
+    ) -> dict[str, Any]:
         """Generate metadata.json content.
 
         Args:
@@ -105,7 +107,9 @@ class BuildExporter:
             "timestamp": self._get_timestamp(),
         }
 
-    def _generate_report(self, plan: BuildPlan, samples_by_type: dict[str, list[dict]]) -> dict[str, Any]:
+    def _generate_report(
+        self, plan: BuildPlan, samples_by_type: dict[str, list[dict]]
+    ) -> dict[str, Any]:
         """Generate report.json content.
 
         Args:
@@ -128,4 +132,5 @@ class BuildExporter:
     def _get_timestamp(self) -> str:
         """Get current timestamp in ISO format."""
         from datetime import datetime
+
         return datetime.utcnow().isoformat() + "Z"

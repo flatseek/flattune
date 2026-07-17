@@ -8,6 +8,7 @@ from typing import Any
 
 class SplitType(Enum):
     """Type of dataset split."""
+
     TRAIN = "train"
     VAL = "val"
     TEST = "test"
@@ -247,7 +248,6 @@ class DatasetSplitter:
             "unique_labels": len(label_counts),
             "by_label": dict(label_counts),
             "label_distribution": {
-                label: count / len(samples)
-                for label, count in label_counts.items()
+                label: count / len(samples) for label, count in label_counts.items()
             },
         }

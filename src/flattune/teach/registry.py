@@ -26,6 +26,7 @@ logger = logging.getLogger(__name__)
 
 class SourceType(Enum):
     """Supported source types for teaching."""
+
     MARKDOWN = "markdown"
     TEXT = "text"
     PDF = "pdf"
@@ -53,12 +54,15 @@ class SourceType(Enum):
 @dataclass
 class ParseResult:
     """Result from a parser containing extracted knowledge."""
+
     source: str
     source_type: SourceType
     content: str
     metadata: dict[str, Any] = field(default_factory=dict)
     entities: list[dict[str, Any]] = field(default_factory=list)
-    relationships: list[tuple[str, str, str]] = field(default_factory=list)  # (subject, predicate, object)
+    relationships: list[tuple[str, str, str]] = field(
+        default_factory=list
+    )  # (subject, predicate, object)
 
 
 class BaseParser(ABC):
@@ -164,6 +168,7 @@ class BaseTeacher(ABC):
 @dataclass
 class GeneratedSample:
     """A generated training sample with quality metadata."""
+
     conversation: list[dict[str, str]]
     sample_type: str
     source: str
@@ -327,7 +332,7 @@ class ParserRegistry(PluginRegistry):
                 instance = parser_class()
                 if instance.can_parse(source_str):
                     # Use priority if available, default to 50
-                    priority = getattr(instance, 'priority', 50)
+                    priority = getattr(instance, "priority", 50)
                     candidates.append((priority, name, parser_class))
             except Exception:
                 pass
@@ -375,7 +380,8 @@ class TeacherRegistry(PluginRegistry):
     def list_local_teachers(cls) -> list[str]:
         """List teachers that support local inference."""
         return [
-            name for name, cls_type in cls._plugins.items()
+            name
+            for name, cls_type in cls._plugins.items()
             if getattr(cls_type, "supports_local", False)
         ]
 
@@ -383,7 +389,8 @@ class TeacherRegistry(PluginRegistry):
     def list_remote_teachers(cls) -> list[str]:
         """List teachers that support remote inference."""
         return [
-            name for name, cls_type in cls._plugins.items()
+            name
+            for name, cls_type in cls._plugins.items()
             if getattr(cls_type, "supports_remote", False)
         ]
 
@@ -433,9 +440,11 @@ def register_parser(name: str, alias: str | None = None):
         class MarkdownParser(BaseParser):
             ...
     """
+
     def decorator(cls: type[BaseParser]) -> type[BaseParser]:
         ParserRegistry.register(name, cls, alias)
         return cls
+
     return decorator
 
 
@@ -447,9 +456,11 @@ def register_teacher(name: str, alias: str | None = None):
         class OpenAITeacher(BaseTeacher):
             ...
     """
+
     def decorator(cls: type[BaseTeacher]) -> type[BaseTeacher]:
         TeacherRegistry.register(name, cls, alias)
         return cls
+
     return decorator
 
 
@@ -461,9 +472,11 @@ def register_generator(name: str, alias: str | None = None):
         class QAGenerator(BaseGenerator):
             ...
     """
+
     def decorator(cls: type[BaseGenerator]) -> type[BaseGenerator]:
         GeneratorRegistry.register(name, cls, alias)
         return cls
+
     return decorator
 
 

@@ -78,9 +78,7 @@ class CLIProvider(FlatseekProvider):
                 timeout=300,  # 5 minute timeout
             )
             if result.returncode != 0:
-                raise RuntimeError(
-                    f"flatseek CLI failed: {result.stderr}"
-                )
+                raise RuntimeError(f"flatseek CLI failed: {result.stderr}")
             return result.stdout
         except subprocess.TimeoutExpired:
             raise RuntimeError("flatseek CLI command timed out")
@@ -137,7 +135,9 @@ class CLIProvider(FlatseekProvider):
         aggs_result = {}
         for agg_name, agg_def in aggs.items():
             if isinstance(agg_def, dict):
-                agg_type = agg_def.get("terms") or agg_def.get("stats") or agg_def.get("cardinality")
+                agg_type = (
+                    agg_def.get("terms") or agg_def.get("stats") or agg_def.get("cardinality")
+                )
                 if isinstance(agg_type, dict):
                     field = agg_type.get("field")
                     if agg_type.get("terms") and field:
@@ -146,10 +146,14 @@ class CLIProvider(FlatseekProvider):
                         for doc in results:
                             value = doc.get(field, "missing")
                             counts[value] = counts.get(value, 0) + 1
-                        aggs_result[agg_name] = {"buckets": [{"key": k, "doc_count": v} for k, v in counts.items()]}
+                        aggs_result[agg_name] = {
+                            "buckets": [{"key": k, "doc_count": v} for k, v in counts.items()]
+                        }
                     elif agg_type.get("stats") and field:
                         # Compute stats
-                        values = [float(doc[field]) for doc in results if doc.get(field) is not None]
+                        values = [
+                            float(doc[field]) for doc in results if doc.get(field) is not None
+                        ]
                         if values:
                             aggs_result[agg_name] = {
                                 "count": len(values),

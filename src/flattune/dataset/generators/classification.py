@@ -43,29 +43,33 @@ class ClassificationGenerator(BaseGenerator):
 
         if category:
             # Direct classification sample
-            samples.append({
-                "instruction": "Classify the following text into a category.",
+            samples.append(
+                {
+                    "instruction": "Classify the following text into a category.",
+                    "input": content,
+                    "output": category,
+                    "metadata": {
+                        "source": document.get("_source", "unknown"),
+                        "generator": "classification",
+                        "type": "classification",
+                        "category": category,
+                    },
+                }
+            )
+
+        # Multi-label classification variant
+        samples.append(
+            {
+                "instruction": "What topics does the following text cover?",
                 "input": content,
-                "output": category,
+                "output": "",  # Model learns topic detection
                 "metadata": {
                     "source": document.get("_source", "unknown"),
                     "generator": "classification",
-                    "type": "classification",
-                    "category": category,
+                    "type": "topic_detection",
                 },
-            })
-
-        # Multi-label classification variant
-        samples.append({
-            "instruction": "What topics does the following text cover?",
-            "input": content,
-            "output": "",  # Model learns topic detection
-            "metadata": {
-                "source": document.get("_source", "unknown"),
-                "generator": "classification",
-                "type": "topic_detection",
-            },
-        })
+            }
+        )
 
         return samples
 

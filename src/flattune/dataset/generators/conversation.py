@@ -38,27 +38,31 @@ class ConversationGenerator(BaseGenerator):
         samples = []
 
         # Single-turn question answering as conversation
-        samples.append({
-            "instruction": "",
-            "input": f"User: Can you explain the following?\n{content}\n\nAssistant:",
-            "output": "",  # Model learns to respond
-            "metadata": {
-                "source": document.get("_source", "unknown"),
-                "generator": "conversation",
-                "type": "qa_dialogue",
-            },
-        })
+        samples.append(
+            {
+                "instruction": "",
+                "input": f"User: Can you explain the following?\n{content}\n\nAssistant:",
+                "output": "",  # Model learns to respond
+                "metadata": {
+                    "source": document.get("_source", "unknown"),
+                    "generator": "conversation",
+                    "type": "qa_dialogue",
+                },
+            }
+        )
 
         # Context-based问答
-        samples.append({
-            "instruction": "",
-            "input": f"Context: {content}\n\nUser: Based on the above, what should I know?\n\nAssistant:",
-            "output": "",
-            "metadata": {
-                "source": document.get("_source", "unknown"),
-                "generator": "conversation",
-                "type": "contextual_qa",
-            },
-        })
+        samples.append(
+            {
+                "instruction": "",
+                "input": f"Context: {content}\n\nUser: Based on the above, what should I know?\n\nAssistant:",
+                "output": "",
+                "metadata": {
+                    "source": document.get("_source", "unknown"),
+                    "generator": "conversation",
+                    "type": "contextual_qa",
+                },
+            }
+        )
 
         return samples

@@ -46,7 +46,11 @@ class JSONSourceDetector(BaseSourceDetector):
                         metadata["length"] = len(data)
                         metadata["type"] = "array"
                         if data:
-                            metadata["item_keys"] = list(data[0].keys()) if isinstance(data[0], dict) else type(data[0]).__name__
+                            metadata["item_keys"] = (
+                                list(data[0].keys())
+                                if isinstance(data[0], dict)
+                                else type(data[0]).__name__
+                            )
                 except json.JSONDecodeError:
                     metadata["parse_error"] = True
 

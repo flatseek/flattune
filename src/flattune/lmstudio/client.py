@@ -526,12 +526,14 @@ class LMStudioClient:
                     total_tokens += tokens
                     total_time += elapsed
 
-                    all_results.append({
-                        "prompt": prompt[:50],
-                        "tokens": tokens,
-                        "elapsed": elapsed,
-                        "tokens_per_second": tokens / elapsed if elapsed > 0 else 0,
-                    })
+                    all_results.append(
+                        {
+                            "prompt": prompt[:50],
+                            "tokens": tokens,
+                            "elapsed": elapsed,
+                            "tokens_per_second": tokens / elapsed if elapsed > 0 else 0,
+                        }
+                    )
 
         avg_latency = total_time / len(all_results) if all_results else 0
         avg_tps = total_tokens / total_time if total_time > 0 else 0
@@ -570,15 +572,17 @@ class LMStudioClient:
 
             if "error" not in result:
                 text = result.get("text", "")
-                results.append({
-                    "prompt": prompt,
-                    "response": text,
-                    "response_length": len(text),
-                    "quality_indicators": {
-                        "has_content": len(text) > 10,
-                        "is_grammar_sound": True,  # Placeholder
-                    },
-                })
+                results.append(
+                    {
+                        "prompt": prompt,
+                        "response": text,
+                        "response_length": len(text),
+                        "quality_indicators": {
+                            "has_content": len(text) > 10,
+                            "is_grammar_sound": True,  # Placeholder
+                        },
+                    }
+                )
 
         return {
             "num_prompts": len(prompts),
@@ -607,11 +611,13 @@ class LMStudioClient:
             )
 
             if "error" not in result:
-                results.append({
-                    "prompt": prompt,
-                    "response": result.get("text", ""),
-                    "instruction_followed": True,  # Placeholder for actual evaluation
-                })
+                results.append(
+                    {
+                        "prompt": prompt,
+                        "response": result.get("text", ""),
+                        "instruction_followed": True,  # Placeholder for actual evaluation
+                    }
+                )
 
         return {
             "num_prompts": len(prompts),
@@ -640,11 +646,13 @@ class LMStudioClient:
             )
 
             if "error" not in result:
-                results.append({
-                    "prompt": prompt,
-                    "response": result.get("text", ""),
-                    "accuracy_score": None,  # Placeholder for actual evaluation
-                })
+                results.append(
+                    {
+                        "prompt": prompt,
+                        "response": result.get("text", ""),
+                        "accuracy_score": None,  # Placeholder for actual evaluation
+                    }
+                )
 
         return {
             "num_prompts": len(prompts),
@@ -673,11 +681,13 @@ class LMStudioClient:
             )
 
             if "error" not in result:
-                results.append({
-                    "prompt": prompt,
-                    "response": result.get("text", ""),
-                    "potential_hallucination": None,  # Placeholder for detection
-                })
+                results.append(
+                    {
+                        "prompt": prompt,
+                        "response": result.get("text", ""),
+                        "potential_hallucination": None,  # Placeholder for detection
+                    }
+                )
 
         return {
             "num_prompts": len(prompts),
@@ -706,11 +716,13 @@ class LMStudioClient:
             )
 
             if "error" not in result:
-                results.append({
-                    "prompt": prompt,
-                    "response": result.get("text", ""),
-                    "regression_detected": False,  # Placeholder for comparison
-                })
+                results.append(
+                    {
+                        "prompt": prompt,
+                        "response": result.get("text", ""),
+                        "regression_detected": False,  # Placeholder for comparison
+                    }
+                )
 
         return {
             "num_prompts": len(prompts),

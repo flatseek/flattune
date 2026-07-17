@@ -10,6 +10,7 @@ class TrainConfig:
     This is a higher-level training configuration that combines
     all settings needed for the trainer.
     """
+
     # Training parameters
     epochs: int = 3
     batch_size: int = 2

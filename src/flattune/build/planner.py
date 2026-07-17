@@ -17,6 +17,7 @@ from flattune.teach.registry import SourceType
 @dataclass
 class TypeSelection:
     """A selected dataset type with planning metadata."""
+
     type_name: str
     confidence: float
     estimated_samples: int
@@ -27,6 +28,7 @@ class TypeSelection:
 @dataclass
 class BuildPlan:
     """Complete build plan for user approval."""
+
     source: str
     source_type: SourceType
     selected_types: list[TypeSelection] = field(default_factory=list)
@@ -114,37 +116,44 @@ class BuildPlanner:
             for type_name in force_types:
                 dt = DatasetTypeRegistry.get(type_name)
                 if dt:
-                    selected_types.append(TypeSelection(
-                        type_name=type_name,
-                        confidence=1.0,
-                        estimated_samples=int(document_count * dt.estimated_samples_per_doc),
-                        generator_name=dt.generator_name,
-                        user_selected=True,
-                    ))
+                    selected_types.append(
+                        TypeSelection(
+                            type_name=type_name,
+                            confidence=1.0,
+                            estimated_samples=int(document_count * dt.estimated_samples_per_doc),
+                            generator_name=dt.generator_name,
+                            user_selected=True,
+                        )
+                    )
         # If user specified types via config, use those
         elif user_requested_types:
             for type_name in user_requested_types:
                 dt = DatasetTypeRegistry.get(type_name)
                 if dt:
-                    selected_types.append(TypeSelection(
-                        type_name=type_name,
-                        confidence=1.0,
-                        estimated_samples=int(document_count * dt.estimated_samples_per_doc),
-                        generator_name=dt.generator_name,
-                        user_selected=True,
-                    ))
+                    selected_types.append(
+                        TypeSelection(
+                            type_name=type_name,
+                            confidence=1.0,
+                            estimated_samples=int(document_count * dt.estimated_samples_per_doc),
+                            generator_name=dt.generator_name,
+                            user_selected=True,
+                        )
+                    )
                 else:
                     # Try to find generator for unknown type
                     from flattune.dataset.generators import get_generator
+
                     try:
                         get_generator(type_name)
-                        selected_types.append(TypeSelection(
-                            type_name=type_name,
-                            confidence=1.0,
-                            estimated_samples=int(document_count * 2.0),
-                            generator_name=type_name,
-                            user_selected=True,
-                        ))
+                        selected_types.append(
+                            TypeSelection(
+                                type_name=type_name,
+                                confidence=1.0,
+                                estimated_samples=int(document_count * 2.0),
+                                generator_name=type_name,
+                                user_selected=True,
+                            )
+                        )
                     except ValueError:
                         pass
         else:
@@ -153,13 +162,17 @@ class BuildPlanner:
                 if confidence >= self.min_confidence_threshold:
                     dt = DatasetTypeRegistry.get(type_name)
                     if dt:
-                        selected_types.append(TypeSelection(
-                            type_name=type_name,
-                            confidence=confidence,
-                            estimated_samples=int(document_count * dt.estimated_samples_per_doc),
-                            generator_name=dt.generator_name,
-                            user_selected=False,
-                        ))
+                        selected_types.append(
+                            TypeSelection(
+                                type_name=type_name,
+                                confidence=confidence,
+                                estimated_samples=int(
+                                    document_count * dt.estimated_samples_per_doc
+                                ),
+                                generator_name=dt.generator_name,
+                                user_selected=False,
+                            )
+                        )
 
         # Build output structure by category
         output_structure: dict[str, list[str]] = {}
@@ -174,7 +187,8 @@ class BuildPlanner:
         # Calculate average confidence
         avg_confidence = (
             sum(s.confidence for s in selected_types) / len(selected_types)
-            if selected_types else 0.0
+            if selected_types
+            else 0.0
         )
 
         return BuildPlan(
@@ -214,13 +228,16 @@ class BuildPlanner:
                 # Create new from registry
                 dt = DatasetTypeRegistry.get(type_name)
                 if dt:
-                    selected_types.append(TypeSelection(
-                        type_name=type_name,
-                        confidence=0.5,  # Lower since not analyzed
-                        estimated_samples=plan.metadata.get("document_count", 0) * dt.estimated_samples_per_doc,
-                        generator_name=dt.generator_name,
-                        user_selected=True,
-                    ))
+                    selected_types.append(
+                        TypeSelection(
+                            type_name=type_name,
+                            confidence=0.5,  # Lower since not analyzed
+                            estimated_samples=plan.metadata.get("document_count", 0)
+                            * dt.estimated_samples_per_doc,
+                            generator_name=dt.generator_name,
+                            user_selected=True,
+                        )
+                    )
 
         # Rebuild output structure
         output_structure: dict[str, list[str]] = {}

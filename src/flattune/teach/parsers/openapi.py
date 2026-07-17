@@ -36,6 +36,7 @@ class OpenAPIParser(BaseParser):
             # Try YAML first, then JSON
             try:
                 import yaml
+
                 spec = yaml.safe_load(content)
             except Exception:
                 spec = json.loads(content)
@@ -76,12 +77,22 @@ class OpenAPIParser(BaseParser):
                 continue
 
             for method, operation in path_item.items():
-                if method.upper() not in ("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS", "HEAD"):
+                if method.upper() not in (
+                    "GET",
+                    "POST",
+                    "PUT",
+                    "DELETE",
+                    "PATCH",
+                    "OPTIONS",
+                    "HEAD",
+                ):
                     continue
                 if not isinstance(operation, dict):
                     continue
 
-                yield self._operation_to_result(source_str, path_str, method.upper(), operation, metadata)
+                yield self._operation_to_result(
+                    source_str, path_str, method.upper(), operation, metadata
+                )
 
     def _operation_to_result(
         self,
@@ -102,13 +113,17 @@ class OpenAPIParser(BaseParser):
 
         # Operation-level parameters (path, query, header)
         for p in operation.get("parameters", []):
-            all_params.append({
-                "name": p.get("name"),
-                "in": p.get("in", "query"),
-                "type": p.get("schema", {}).get("type", "string") if p.get("schema") else "string",
-                "description": p.get("description", ""),
-                "required": p.get("required", False),
-            })
+            all_params.append(
+                {
+                    "name": p.get("name"),
+                    "in": p.get("in", "query"),
+                    "type": p.get("schema", {}).get("type", "string")
+                    if p.get("schema")
+                    else "string",
+                    "description": p.get("description", ""),
+                    "required": p.get("required", False),
+                }
+            )
 
         # Request body parameters
         request_body = operation.get("requestBody")
@@ -118,21 +133,25 @@ class OpenAPIParser(BaseParser):
                 schema = media.get("schema", {})
                 properties = schema.get("properties", {})
                 for prop_name, prop in properties.items():
-                    all_params.append({
-                        "name": prop_name,
-                        "in": "body",
-                        "type": prop.get("type", "string"),
-                        "description": prop.get("description", ""),
-                        "required": prop_name in schema.get("required", []),
-                    })
+                    all_params.append(
+                        {
+                            "name": prop_name,
+                            "in": "body",
+                            "type": prop.get("type", "string"),
+                            "description": prop.get("description", ""),
+                            "required": prop_name in schema.get("required", []),
+                        }
+                    )
 
-        metadata.update({
-            "type": "endpoint",
-            "operation_id": op_id,
-            "method": method,
-            "path": path,
-            "parameters": all_params,
-        })
+        metadata.update(
+            {
+                "type": "endpoint",
+                "operation_id": op_id,
+                "method": method,
+                "path": path,
+                "parameters": all_params,
+            }
+        )
 
         # Build content
         content_parts = [
@@ -151,9 +170,9 @@ class OpenAPIParser(BaseParser):
             content_parts.append("\nParameters:")
             for p in params:
                 param_str = f"- {p.get('name')} ({p.get('in', 'query')}): {p.get('type', 'string')}"
-                if p.get('required'):
+                if p.get("required"):
                     param_str += " [required]"
-                if p.get('description'):
+                if p.get("description"):
                     param_str += f" - {p.get('description')}"
                 content_parts.append(param_str)
 
@@ -200,4 +219,5 @@ class OpenAPIParser(BaseParser):
 @register_parser("swagger", alias="openapi")
 class SwaggerParser(OpenAPIParser):
     """Parser for Swagger/OpenAPI 2.0 specs."""
+
     pass

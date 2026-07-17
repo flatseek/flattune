@@ -53,7 +53,9 @@ class ToolCallGenerator(BaseGenerator):
             node_type = ""
 
         # Skip non-endpoint nodes (like 'servers' info)
-        if node_type not in ("", "endpoint", "tool", "function") and not metadata.get("operation_id"):
+        if node_type not in ("", "endpoint", "tool", "function") and not metadata.get(
+            "operation_id"
+        ):
             return
 
         # Extract tool information from various metadata fields
@@ -62,20 +64,24 @@ class ToolCallGenerator(BaseGenerator):
             path = metadata.get("path", "")
             method = metadata.get("method", "").upper()
             # Get last 2-3 path segments as name
-            parts = [p for p in path.strip("/").split("/") if p and p not in ("api", "v1", "v2", "v3")]
-            endpoint_name = "_".join(parts[-2:]) if len(parts) > 1 else (parts[-1] if parts else "api")
+            parts = [
+                p for p in path.strip("/").split("/") if p and p not in ("api", "v1", "v2", "v3")
+            ]
+            endpoint_name = (
+                "_".join(parts[-2:]) if len(parts) > 1 else (parts[-1] if parts else "api")
+            )
             tool_name = f"{method}_{endpoint_name}" if method else endpoint_name
         else:
             tool_name = (
-                metadata.get("name") or
-                metadata.get("operation_id") or
-                metadata.get("tool") or
-                metadata.get("function") or
-                "unknown_tool"
+                metadata.get("name")
+                or metadata.get("operation_id")
+                or metadata.get("tool")
+                or metadata.get("function")
+                or "unknown_tool"
             )
         # Clean up tool name (remove special chars except underscore)
-        tool_name = re.sub(r'[^a-zA-Z0-9_]', '_', tool_name)
-        tool_name = re.sub(r'_+', '_', tool_name).strip('_')
+        tool_name = re.sub(r"[^a-zA-Z0-9_]", "_", tool_name)
+        tool_name = re.sub(r"_+", "_", tool_name).strip("_")
 
         tool_description = metadata.get("description") or metadata.get("summary") or context[:500]
         parameters = metadata.get("parameters", [])
@@ -138,8 +144,11 @@ class ToolCallGenerator(BaseGenerator):
         priority_order = ["body", "query", "path", "header"]
         sorted_params = sorted(
             parameters,
-            key=lambda p: priority_order.index(p.get("in", "header"))
-            if p.get("in", "header") in priority_order else 99
+            key=lambda p: (
+                priority_order.index(p.get("in", "header"))
+                if p.get("in", "header") in priority_order
+                else 99
+            ),
         )
 
         for param in sorted_params[:2]:  # Use top 2 meaningful params
@@ -156,10 +165,12 @@ class ToolCallGenerator(BaseGenerator):
                     },
                     {
                         "role": "assistant",
-                        "content": json.dumps({
-                            "tool": tool_name,
-                            "parameters": {param_name: f"<{param_in}:{param_type}>"},
-                        }),
+                        "content": json.dumps(
+                            {
+                                "tool": tool_name,
+                                "parameters": {param_name: f"<{param_in}:{param_type}>"},
+                            }
+                        ),
                     },
                 ],
                 sample_type="slot_fill",
@@ -183,7 +194,10 @@ class ToolCallGenerator(BaseGenerator):
             yield GeneratedSample(
                 conversation=[
                     {"role": "user", "content": intent},
-                    {"role": "assistant", "content": json.dumps({"tool": tool_name, "parameters": {}})},
+                    {
+                        "role": "assistant",
+                        "content": json.dumps({"tool": tool_name, "parameters": {}}),
+                    },
                 ],
                 sample_type="tool_call",
                 source=source,

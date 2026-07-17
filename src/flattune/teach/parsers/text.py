@@ -124,7 +124,6 @@ class CSVParser(BaseParser):
                 content=content,
                 metadata=row_metadata,
                 entities=[
-                    {"type": k, "content": v}
-                    for k, v in row_data.items() if v and len(v) < 100
+                    {"type": k, "content": v} for k, v in row_data.items() if v and len(v) < 100
                 ],
             )

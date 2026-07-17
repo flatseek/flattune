@@ -42,7 +42,9 @@ cli.add_command(teach_group)
 @click.argument("config_file", type=click.Path(exists=True))
 @click.option("--yes", "-y", is_flag=True, help="Skip interactive approval and use suggested types")
 @click.option("--source", type=str, help="Source file/directory (overrides config)")
-@click.option("--types", "-t", multiple=True, help="Dataset types to generate (can specify multiple)")
+@click.option(
+    "--types", "-t", multiple=True, help="Dataset types to generate (can specify multiple)"
+)
 def build(config_file: str, yes: bool = False, source: str | None = None, types: tuple = ()):
     """Extract data and generate dataset from Flatseek index.
 
@@ -570,6 +572,7 @@ def report(config_file: str):
     if train_metadata.get("metrics"):
         try:
             import matplotlib
+
             matplotlib.use("Agg")
             import matplotlib.pyplot as plt
 
@@ -672,7 +675,9 @@ def run(config_file: str):
     click.echo("[run:train] Training model...")
     click.echo("=" * 60)
 
-    train_dataset = dataset_paths.get("train", run_folder / "dataset" / f"{config.name}_train.jsonl")
+    train_dataset = dataset_paths.get(
+        "train", run_folder / "dataset" / f"{config.name}_train.jsonl"
+    )
 
     with ReproducibilityContext(seed=config.train.seed) as ctx:
         trainer = TrainerFactory.create(

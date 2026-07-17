@@ -44,6 +44,7 @@ class OllamaTeacher(BaseTeacher):
         if self._client is None:
             try:
                 import ollama
+
                 self._client = ollama
             except ImportError:
                 logger.error("Ollama package not installed. Install with: pip install ollama")
@@ -124,14 +125,12 @@ Generate a question that tests understanding of this knowledge, followed by a co
 Format your response as:
 Question: <your question>
 Answer: <your answer>""",
-
             "summarization": f"""Summarize the following knowledge concisely.
 
 Knowledge:
 {knowledge}
 
 Provide a clear, concise summary that captures the key points.""",
-
             "tool_call": f"""Based on the following API/tool documentation, generate example conversations
 showing how a user would request actions and how the tool should be called.
 
@@ -143,7 +142,7 @@ Generate 2-3 diverse examples of user requests and appropriate tool calls.""",
 
         return base_prompts.get(
             sample_type,
-            f"Based on the following knowledge, generate a {sample_type} sample.\n\nKnowledge:\n{knowledge}"
+            f"Based on the following knowledge, generate a {sample_type} sample.\n\nKnowledge:\n{knowledge}",
         )
 
     def _parse_response(

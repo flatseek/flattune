@@ -1,6 +1,5 @@
 """Automatic FlatSeek provider selection based on available backends."""
 
-
 from flattune.config import FlatseekMode, FlatseekSource
 from flattune.flatseek.cli_provider import CLIProvider
 from flattune.flatseek.library_provider import LibraryProvider

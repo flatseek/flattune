@@ -10,6 +10,7 @@ from typing import Any
 @dataclass
 class GeneratorOutput:
     """Standard output format for generators."""
+
     instruction: str
     input: str
     output: str

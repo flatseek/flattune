@@ -11,6 +11,7 @@ __all__ = ["BaseGenerator", "GeneratedSample"]
 @dataclass
 class GeneratedSample:
     """A generated training sample with quality metadata."""
+
     conversation: list[dict[str, str]]
     sample_type: str
     source: str

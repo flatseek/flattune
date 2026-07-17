@@ -101,27 +101,26 @@ class BaseTeacher:
         """
         prompts = {
             "qa": "You are an expert educator who creates clear, accurate Q&A pairs. "
-                  "Generate a question and comprehensive answer based on the provided knowledge. "
-                  "The answer should be informative yet concise.",
+            "Generate a question and comprehensive answer based on the provided knowledge. "
+            "The answer should be informative yet concise.",
             "summarization": "You are an expert at creating concise summaries. "
-                             "Generate a summary of the provided content.",
+            "Generate a summary of the provided content.",
             "extraction": "You are a data extraction expert. "
-                          "Extract key information from the provided content.",
-            "comparison": "You are an expert analyst. "
-                         "Compare and contrast the presented concepts.",
+            "Extract key information from the provided content.",
+            "comparison": "You are an expert analyst. Compare and contrast the presented concepts.",
             "reasoning": "You are an expert reasoning assistant. "
-                         "Provide step-by-step reasoning based on the content.",
+            "Provide step-by-step reasoning based on the content.",
             "tool_call": "You are an expert API documentation writer. "
-                         "Generate tool calling examples based on the provided API knowledge.",
+            "Generate tool calling examples based on the provided API knowledge.",
             "intent": "You are an expert at understanding user intent. "
-                      "Generate varied ways users might request the same action.",
+            "Generate varied ways users might request the same action.",
             "slot_fill": "You are an expert at parameter extraction. "
-                         "Generate examples of user requests with implied parameters.",
+            "Generate examples of user requests with implied parameters.",
             "nl_to_sql": "You are an expert SQL developer. "
-                         "Generate natural language to SQL queries.",
+            "Generate natural language to SQL queries.",
         }
 
         return prompts.get(
             sample_type,
-            f"You are an expert educator. Generate educational content for: {sample_type}"
+            f"You are an expert educator. Generate educational content for: {sample_type}",
         )

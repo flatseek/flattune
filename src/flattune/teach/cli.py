@@ -20,14 +20,29 @@ def teach():
 @teach.command()
 @click.argument("sources", nargs=-1, required=True)
 @click.option("--output", "-o", default="knowledge_dataset.jsonl", help="Output file path")
-@click.option("--teacher", "-t", default=None, help="Teacher model (openai/anthropic/ollama). Omit for distill mode.")
+@click.option(
+    "--teacher",
+    "-t",
+    default=None,
+    help="Teacher model (openai/anthropic/ollama). Omit for distill mode.",
+)
 @click.option("--model", "-m", default="gpt-4o-mini", help="Teacher model name")
-@click.option("--sample-types", "-s", multiple=True, default=["qa", "summarization", "extraction", "reasoning"], help="Sample types to generate")
+@click.option(
+    "--sample-types",
+    "-s",
+    multiple=True,
+    default=["qa", "summarization", "extraction", "reasoning"],
+    help="Sample types to generate",
+)
 @click.option("--max-samples", default=None, type=int, help="Maximum samples to generate")
 @click.option("--min-quality", default=0.5, type=float, help="Minimum quality score")
-@click.option("--distill", is_flag=True, help="Distill mode: generate from templates without LLM teacher")
+@click.option(
+    "--distill", is_flag=True, help="Distill mode: generate from templates without LLM teacher"
+)
 @click.option("--system-prompt", default=None, help="System prompt to prepend to each sample")
-def knowledge(sources, output, teacher, model, sample_types, max_samples, min_quality, distill, system_prompt):
+def knowledge(
+    sources, output, teacher, model, sample_types, max_samples, min_quality, distill, system_prompt
+):
     """Teach knowledge from documents.
 
     SOURCES: Source files or directories to process (Markdown, TXT, PDF, HTML, CSV, JSON, FlatSeek Index)
@@ -82,8 +97,16 @@ def knowledge(sources, output, teacher, model, sample_types, max_samples, min_qu
 @click.option("--output", "-o", default="software_dataset.jsonl", help="Output file path")
 @click.option("--teacher", "-t", default=None, help="Teacher model. Omit for distill mode.")
 @click.option("--model", "-m", default="gpt-4o-mini", help="Teacher model name")
-@click.option("--sample-types", "-s", multiple=True, default=["tool_call", "intent", "slot_fill", "validation"], help="Sample types")
-@click.option("--distill", is_flag=True, help="Distill mode: generate from templates without LLM teacher")
+@click.option(
+    "--sample-types",
+    "-s",
+    multiple=True,
+    default=["tool_call", "intent", "slot_fill", "validation"],
+    help="Sample types",
+)
+@click.option(
+    "--distill", is_flag=True, help="Distill mode: generate from templates without LLM teacher"
+)
 @click.option("--system-prompt", default=None, help="System prompt to prepend to each sample")
 @click.option("--max-samples", default=None, type=int, help="Maximum number of samples to generate")
 def software(sources, output, teacher, model, sample_types, distill, system_prompt, max_samples):
@@ -133,7 +156,9 @@ def software(sources, output, teacher, model, sample_types, distill, system_prom
 @click.option("--output", "-o", default="database_dataset.jsonl", help="Output file path")
 @click.option("--teacher", "-t", default=None, help="Teacher model. Omit for distill mode.")
 @click.option("--model", "-m", default="gpt-4o-mini", help="Teacher model name")
-@click.option("--distill", is_flag=True, help="Distill mode: generate from templates without LLM teacher")
+@click.option(
+    "--distill", is_flag=True, help="Distill mode: generate from templates without LLM teacher"
+)
 def database(schema, output, teacher, model, distill):
     """Teach database schemas.
 
@@ -178,7 +203,9 @@ def database(schema, output, teacher, model, distill):
 @click.option("--output", "-o", default="openapi_dataset.jsonl", help="Output file path")
 @click.option("--teacher", "-t", default=None, help="Teacher model. Omit for distill mode.")
 @click.option("--model", "-m", default="gpt-4o-mini", help="Teacher model name")
-@click.option("--distill", is_flag=True, help="Distill mode: generate from templates without LLM teacher")
+@click.option(
+    "--distill", is_flag=True, help="Distill mode: generate from templates without LLM teacher"
+)
 def openapi(spec, output, teacher, model, distill):
     """Teach OpenAPI/Swagger specifications.
 
@@ -192,7 +219,14 @@ def openapi(spec, output, teacher, model, distill):
     config = PipelineConfig(
         teacher=teacher,
         teacher_model=model,
-        sample_types=["tool_call", "intent", "slot_fill", "validation", "error_recovery", "multi_turn"],
+        sample_types=[
+            "tool_call",
+            "intent",
+            "slot_fill",
+            "validation",
+            "error_recovery",
+            "multi_turn",
+        ],
     )
 
     pipeline = TeachPipeline(config, distill_mode=distill)
@@ -223,7 +257,9 @@ def openapi(spec, output, teacher, model, distill):
 @click.option("--output", "-o", default="mcp_dataset.jsonl", help="Output file path")
 @click.option("--teacher", "-t", default=None, help="Teacher model. Omit for distill mode.")
 @click.option("--model", "-m", default="gpt-4o-mini", help="Teacher model name")
-@click.option("--distill", is_flag=True, help="Distill mode: generate from templates without LLM teacher")
+@click.option(
+    "--distill", is_flag=True, help="Distill mode: generate from templates without LLM teacher"
+)
 def mcp(server, output, teacher, model, distill):
     """Teach MCP (Model Context Protocol) servers.
 

@@ -16,6 +16,7 @@ logger = logging.getLogger(__name__)
 @dataclass
 class ApprovalResult:
     """Result from user approval interaction."""
+
     approved: bool
     selected_types: list[str]
     modified_plan: BuildPlan | None = None
@@ -106,12 +107,14 @@ class InteractiveApproval:
             if dt:
                 lines.append(f"      {dt.description}")
 
-        lines.extend([
-            "",
-            f"Total estimated samples: {plan.total_estimated_samples}",
-            "",
-            "Output structure:",
-        ])
+        lines.extend(
+            [
+                "",
+                f"Total estimated samples: {plan.total_estimated_samples}",
+                "",
+                "Output structure:",
+            ]
+        )
 
         for category, types in plan.output_structure.items():
             lines.append(f"  {category}/")
@@ -163,10 +166,7 @@ class InteractiveApproval:
                 if 0 <= idx < len(plan.selected_types):
                     selected_indices.add(idx)
 
-        return [
-            plan.selected_types[i].type_name
-            for i in selected_indices
-        ]
+        return [plan.selected_types[i].type_name for i in selected_indices]
 
     def confirm(self, plan: BuildPlan) -> bool:
         """Simple yes/no confirmation.
