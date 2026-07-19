@@ -379,11 +379,27 @@ class DatasetBuilder:
         Returns:
             True if document passes all filters.
         """
-        # Length filter
-        content = self._extract_content(doc)
-        if len(content) < self.dataset_config.min_length:
+        # Check if document has any non-empty values
+        # For KV data (athletes), check if at least one value exists
+        has_content = False
+        for key, value in doc.items():
+            if key.startswith("_"):
+                continue
+            if value is not None and str(value).strip():
+                has_content = True
+                break
+
+        if not has_content:
             return False
-        if len(content) > self.dataset_config.max_length:
+
+        # Length filter (only for text-heavy documents)
+        content = self._extract_content(doc)
+        if content and len(content) < self.dataset_config.min_length:
+            # For KV docs with short values, don't reject if they have content
+            if len(doc) > 1:  # Has multiple fields = likely KV data
+                return True
+            return False
+        if content and len(content) > self.dataset_config.max_length:
             # Documents can still be truncated, so we don't reject here
             pass
 
